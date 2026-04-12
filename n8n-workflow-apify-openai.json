@@ -1,0 +1,158 @@
+{
+  "name": "N8N Apify OpenAI Viral Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-content",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [ 200, 300 ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~instagram-scraper/runs?token={{$env.APIFY_API_TOKEN}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "usernames", "value": "={{$json.body.competitors}}" },
+            { "name": "resultsLimit", "value": "15" },
+            { "name": "addParentData", "value": "false" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Apify Run Actor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [ 400, 300 ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "id": "3",
+      "name": "Wait (2 Mins)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [ 600, 300 ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.apify.com/v2/datasets/{{$node['Apify Run Actor'].json.data.defaultDatasetId}}/items",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Get Apify Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [ 800, 300 ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4-turbo-preview",
+          "mode": "list",
+          "cachedResultName": "gpt-4-turbo-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Analiza estos videos virales y devuelve JSON."
+            },
+            {
+              "role": "user",
+              "content": "=Estos son los posts virales del nicho {{$node['Webhook Trigger'].json.body.niche}}:\n{{JSON.stringify($json)}}\n\nGenera 10 ideas virales estructuradas."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "5",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.1,
+      "position": [ 1000, 300 ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NEXT_PUBLIC_APP_URL}}/api/webhooks/n8n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "projectId", "value": "={{$node['Webhook Trigger'].json.body.projectId}}" },
+            { "name": "status", "value": "COMPLETED" },
+            { "name": "resultJSON", "value": "={{$json.message.content}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6",
+      "name": "Send back to Next.js API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [ 1200, 300 ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [ { "node": "Apify Run Actor", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Apify Run Actor": {
+      "main": [
+        [ { "node": "Wait (2 Mins)", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Wait (2 Mins)": {
+      "main": [
+        [ { "node": "Get Apify Results", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Get Apify Results": {
+      "main": [
+        [ { "node": "OpenAI", "type": "main", "index": 0 } ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [ { "node": "Send back to Next.js API", "type": "main", "index": 0 } ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f781ea3a-ebbe-4977-bad8-2de9632831b5"
+}
