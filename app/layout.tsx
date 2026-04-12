@@ -6,7 +6,7 @@ import AuthProvider from "@/components/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI Viral Content Platform",
+  title: "LucIA - Viral Content Platform",
   description: "End-to-end SAAS for viral content generation via n8n and Apify",
 };
 

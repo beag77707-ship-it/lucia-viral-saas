@@ -22,7 +22,7 @@ export default async function DashboardLayout({
       <aside className="w-64 bg-dark-800 border-r border-white/5 flex flex-col">
         <div className="p-6">
           <Link href="/dashboard" className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
-            ViralSaaS
+            LucIA
           </Link>
           <div className="mt-2 text-xs font-medium px-2 py-1 bg-white/5 rounded text-gray-400 max-w-fit">
             Plan: {(session.user as any).plan}

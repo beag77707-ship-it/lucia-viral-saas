@@ -63,7 +63,7 @@ export default function Home() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-gray-300">Inteligencia Artificial Viral</span>
+            <span className="text-sm font-medium text-gray-300">LucIA by ViralSaaS</span>
           </div>
           <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
             Domina el contenido viral.
