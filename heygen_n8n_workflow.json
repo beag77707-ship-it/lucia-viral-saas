@@ -102,7 +102,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$node[\"Webhook: Start Generation\"].json.body.callbackUrl || 'http://localhost:3000/api/webhooks/n8n'}}",
+        "url": "={{$node[\"Webhook: Start Generation\"].json.body.callbackUrl || 'https://lucia-viral-saas.vercel.app/api/webhooks/n8n'}}",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
