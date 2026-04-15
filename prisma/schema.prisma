@@ -3,15 +3,20 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
   password  String
-  plan      Plan      @default(BASIC)
+  name      String?
+  image     String?
+  plan      String    @default("BASIC")
+  heygenAvatarId String?
+  heygenVideoUrl String?
+  heygenStatus String    @default("IDLE")
   projects  Project[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -22,23 +27,13 @@ model Project {
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   niche       String
-  competitors Json
-  resultJSON  Json?
+  competitors String
+  resultJSON  String?
   pdfUrl      String?
   videoUrl    String?
-  status      Status   @default(IDLE)
+  status      String   @default("IDLE")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-enum Plan {
-  BASIC
-  PRO
-}
 
-enum Status {
-  IDLE
-  PROCESSING
-  COMPLETED
-  FAILED
-}

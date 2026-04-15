@@ -11,13 +11,16 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        card: "var(--card)",
+        "card-foreground": "var(--card-foreground)",
+        border: "var(--border)",
         primary: {
           DEFAULT: "#4F46E5",
           dark: "#4338CA",
         },
         dark: {
-          900: "#0F172A",
-          800: "#1E293B",
+          900: "var(--background)",
+          800: "var(--card)",
           700: "#334155",
         }
       },

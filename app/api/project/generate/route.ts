@@ -12,8 +12,13 @@ export async function POST(req: Request) {
     }
 
     const userId = (session.user as any).id;
+    const userProfile = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { heygenAvatarId: true, heygenStatus: true, plan: true }
+    });
+
     const body = await req.json();
-    const { niche, competitors, plan } = body;
+    const { niche, competitors, plan: bodyPlan } = body;
 
     if (!niche || !competitors || competitors.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -37,13 +42,17 @@ export async function POST(req: Request) {
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
     if (webhookUrl) {
       try {
-        // Ejecutamos de manera asíncrona pero sin bloquear Next.js
+        // Enviar datos adicionales si es Plan B y el avatar está listo
+        const isPlanB = userProfile?.plan === "PLAN_B";
+        const heygenAvatarId = isPlanB ? userProfile?.heygenAvatarId : null;
+
         axios.post(webhookUrl, {
           projectId: project.id,
           userId,
           niche,
           competitors,
-          plan: plan || "BASIC",
+          plan: userProfile?.plan || "BASIC",
+          heygenAvatarId: heygenAvatarId,
         }).catch(err => console.error("Error triggering n8n webhook:", err.message));
       } catch (err) {
         console.error("Failed to trigger webhook", err);

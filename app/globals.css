@@ -3,8 +3,20 @@
 @tailwind utilities;
 
 :root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --border: #e2e8f0;
+  --primary: #4F46E5;
+}
+
+.dark {
   --background: #0f172a;
   --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --border: rgba(255, 255, 255, 0.05);
 }
 
 body {

@@ -33,7 +33,11 @@ export const authOptions: AuthOptions = {
         return {
           id: user.id,
           email: user.email,
+          name: user.name,
+          image: user.image,
           plan: user.plan,
+          heygenAvatarId: user.heygenAvatarId,
+          heygenStatus: user.heygenStatus,
         };
       },
     }),
@@ -42,10 +46,22 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.plan = (user as any).plan;
+        token.name = (user as any).name;
+        token.image = (user as any).image;
+        token.heygenAvatarId = (user as any).heygenAvatarId;
+        token.heygenStatus = (user as any).heygenStatus;
+      }
+      // Permitir actualizar la sesión cuando el usuario edita su perfil
+      if (trigger === "update" && session) {
+        token.name = session.name || token.name;
+        token.image = session.image || token.image;
+        token.plan = session.plan || token.plan;
+        token.heygenStatus = session.heygenStatus || token.heygenStatus;
+        token.heygenAvatarId = session.heygenAvatarId || token.heygenAvatarId;
       }
       return token;
     },
@@ -53,6 +69,10 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).plan = token.plan;
+        (session.user as any).name = token.name;
+        (session.user as any).image = token.image;
+        (session.user as any).heygenAvatarId = token.heygenAvatarId;
+        (session.user as any).heygenStatus = token.heygenStatus;
       }
       return session;
     },

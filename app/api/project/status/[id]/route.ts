@@ -17,6 +17,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       select: {
         id: true,
         status: true,
+        niche: true,
         resultJSON: true,
         pdfUrl: true,
         videoUrl: true,
