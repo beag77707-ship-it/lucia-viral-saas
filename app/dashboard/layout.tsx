@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import SidebarNav from "../../components/SidebarNav";
 import Link from "next/link";
 import LogoutButton from "../../components/LogoutButton";
