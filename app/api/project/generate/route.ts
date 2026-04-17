@@ -69,8 +69,12 @@ export async function POST(req: Request) {
       { message: "Project generation started", projectId: project.id },
       { status: 202 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Generate Error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Error de Generación", 
+      details: error.message || "Error desconocido",
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+    }, { status: 500 });
   }
 }
