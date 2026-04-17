@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileDown, Calendar, Hash, Video, Settings, PlayCircle, Loader2, X, Film } from "lucide-react";
