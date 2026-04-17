@@ -94,6 +94,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Webhook received but no specific action taken" });
   } catch (error: any) {
     console.error("CRITICAL N8N Webhook Error:", error);
-    return NextResponse.json({ error: "Internal server error", details: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Internal server error", 
+      details: error.message || "Unknown error" 
+    }, { status: 500 });
   }
 }
