@@ -41,10 +41,10 @@ export async function POST(req: Request) {
     );
   } catch (error: any) {
     console.error("Critical Register Error:", error);
+    // Ponemos TODO en el campo 'error' para que se vea en el recuadro rojo de la web
+    const detailedErrorMessage = `[${error.code || 'SIN_CODIGO'}] ${error.message || 'Error desconocido'}`;
     return NextResponse.json({ 
-      error: "Error en el servidor de Base de Datos", 
-      details: error.message || "Error desconocido",
-      prismaCode: error.code
+      error: `Error de BD: ${detailedErrorMessage}`
     }, { status: 500 });
   } finally {
     await prisma.$disconnect();
