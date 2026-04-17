@@ -31,32 +31,47 @@ export async function POST(req: Request) {
     // Caso 1: Actualizar Proyecto
     if (projectId) {
       const updateData: any = {};
+      
+      // Aseguramos que resultJSON sea siempre un STRING para la base de datos
       if (resultJSON !== undefined && resultJSON !== null) {
-        try {
-          updateData.resultJSON = typeof resultJSON === "string" ? JSON.parse(resultJSON) : resultJSON;
-        } catch (e) {
-          updateData.resultJSON = { rawText: resultJSON };
+        if (typeof resultJSON === "object") {
+          updateData.resultJSON = JSON.stringify(resultJSON);
+        } else {
+          updateData.resultJSON = resultJSON;
         }
       }
+      
       if (pdfUrl !== undefined) updateData.pdfUrl = pdfUrl;
       if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
       if (status) updateData.status = status;
 
-      console.log(`Attempting to update project ${projectId}...`);
+      console.log(`Updating project ${projectId} with data:`, updateData);
       
       try {
         const project = await prisma.project.update({
           where: { id: projectId },
           data: updateData,
         });
-        console.log(`Project ${projectId} updated successfully`);
-        return NextResponse.json({ message: "Project updated", project });
-      } catch (prismaError: any) {
-        console.error("Prisma Update Error:", prismaError.message);
+        console.log(`✅ Project ${projectId} updated successfully`);
         return NextResponse.json({ 
-          error: "Database update failed", 
-          details: prismaError.message === "Record to update not found." ? "El projectId no existe en la base de datos." : prismaError.message
-        }, { status: 404 });
+          message: "Project updated successfully", 
+          projectId: project.id 
+        });
+      } catch (prismaError: any) {
+        console.error("❌ Prisma Update Error:", prismaError.message);
+        
+        // Error específico para cuando el registro no existe
+        if (prismaError.code === 'P2025') {
+          return NextResponse.json({ 
+            error: "Project not found", 
+            details: `El projectId '${projectId}' no existe en tu base de datos. Asegúrate de que no has borrado el proyecto antes de que terminara el flujo.` 
+          }, { status: 404 });
+        }
+
+        return NextResponse.json({ 
+          error: "Database error", 
+          details: prismaError.message 
+        }, { status: 500 });
       }
     }
 

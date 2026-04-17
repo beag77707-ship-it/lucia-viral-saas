@@ -263,10 +263,10 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://lucia-viral-saas-git-master-beag77707-3340s-projects.vercel.app/api/webhooks/n8n",
+        "url": "https://lucia-viral-saas.vercel.app/api/webhooks/n8n",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{\nJSON.stringify({\n  projectId: $node['Webhook Trigger'].json.body.projectId,\n  resultJSON: $node['Code in JavaScript'].json.ideas,\n  pdfUrl: $json.pdfUrl,\n  status: \"COMPLETED\"\n})\n}}\n",
+        "jsonBody": "={{\nJSON.stringify({\n  projectId: $node['Webhook Trigger'].json.body.projectId,\n  resultJSON: $node['Code in JavaScript'].json.ideas,\n  pdfUrl: $node['Code in JavaScript1'].json.pdfUrl,\n  status: \"COMPLETED\"\n})\n}}\n",
         "options": {}
       },
       "id": "3ff6d4f1-5bb7-4656-b41a-64d4e06e29a0",
@@ -320,6 +320,19 @@
           "name": "Header Auth account"
         }
       }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Buscamos los datos de forma flexible (no importa el nombre del nodo anterior)\nconst data = $input.all()[0].json;\n\n// 2. Intentamos encontrar la URL en cualquier formato que PDFMonkey decida enviarla\nconst doc = data.document_card || data.document || data;\nconst rawUrl = doc.download_url || (data.documents && data.documents[0] ? data.documents[0].download_url : null);\n\nif (!rawUrl) {\n  throw new Error(\"No se encontró la URL del PDF. Revisa la salida del nodo anterior.\");\n}\n\n// 3. Limpiamos solo lo necesario\nconst cleanUrl = rawUrl.split('?')[0];\n\nreturn {\n  pdfUrl: cleanUrl,\n  documentId: doc.id || data.id\n};"
+      },
+      "id": "code-cleaning-pdf-url",
+      "name": "Code in JavaScript1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        736
+      ]
     }
   ],
   "pinData": {
