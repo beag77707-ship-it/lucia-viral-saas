@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const userId = (session.user as any).id;
     const userProfile = await prisma.user.findUnique({
       where: { id: userId },
-      select: { heygenAvatarId: true, heygenStatus: true, plan: true }
+      select: { heygenAvatarId: true, heygenStatus: true, plan: true, selectedScenarios: true, videoCredits: true }
     });
 
     const body = await req.json();
@@ -55,6 +55,8 @@ export async function POST(req: Request) {
           competitors,
           plan: userProfile?.plan || "BASIC",
           heygenAvatarId: heygenAvatarId,
+          selectedScenarios: userProfile?.selectedScenarios,
+          videoCredits: userProfile?.videoCredits,
         }).catch(err => console.error("Error triggering n8n webhook:", err.message));
       } catch (err) {
         console.error("Failed to trigger webhook", err);

@@ -1,0 +1,456 @@
+{
+  "name": "Crear calendario de contenido",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-content",
+        "options": {}
+      },
+      "id": "ef799722-de9d-496f-88b5-f2e478c45043",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "957ff594-1b22-4029-aabf-c3d69f456cd2"
+    },
+    {
+      "parameters": {
+        "jsCode": "let itemsRaw = $input.all().map(i => i.json);\n\n// Si por alguna razón n8n agrupa la respuesta en array, lo desempaquetamos\nif(itemsRaw.length === 1 && Array.isArray(itemsRaw[0])) {\n  itemsRaw = itemsRaw[0];\n}\n\n// solo reels (videos)\nconst reels = itemsRaw.filter(p => p.type === \"Video\" && p.videoUrl);\n\n// calcular score viral\nconst sorted = reels\n  .map(p => ({\n    ...p,\n    viralScore: (\n      (p.videoViewCount || 0) * 0.6 +\n      (p.likesCount || 0) * 0.3 +\n      (p.commentsCount || 0) * 0.1\n    )\n  }))\n  .sort((a, b) => b.viralScore - a.viralScore)\n  .slice(0, 5); // top 5\n\nreturn sorted.map(r => ({ json: r }));"
+      },
+      "id": "b2b1642c-d876-4676-b025-23e71fd5ef03",
+      "name": "Code: Filter Viral Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.videoUrl}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "2b6ed1e9-c876-4207-a396-27774542b135",
+      "name": "HTTP Download Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "1bbe7c8a-fd8b-4424-9f2f-dc58d63a0fd3",
+      "name": "Merge By Index",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1792,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const combined = $input.all().map((i, index) => {\n  let transcript = 'Sin texto reconocido';\n  if (i.json.text) transcript = i.json.text;\n  \n  return `--- VIDEO VIRAL ${index + 1} --->\\n` +\n         `URL Original: ${i.json.videoUrl}\\n` +\n         `Vistas: ${i.json.videoViewCount}\\n` +\n         `Likes: ${i.json.likesCount}\\n` +\n         `Score Viral: ${i.json.viralScore}\\n` +\n         `TEXTO HABLADO COPIADO DE SU VOZ: \\\"${transcript}\\\"\\n`;\n}).join(\"\\n\\n\");\n\nreturn { json: { corpus: combined } };"
+      },
+      "id": "30a77e13-0feb-4a23-b36d-c79aa9687cfb",
+      "name": "Code: Aggregate Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Nicho: {{$node['Webhook Trigger'].json.body.niche}}\nReferentes: {{$node['Webhook Trigger'].json.body.competitors}}\n\nA continuación tienes los 5 vídeos más virales con sus transcripciones reales:\n\n{{ $json.corpus }}\n\n----------------------------------\n\nEres un experto en contenido viral para redes sociales (Instagram Reels / TikTok).\n\nTu objetivo es replicar patrones virales, no inventar desde cero.\n\nAnaliza profundamente:\n- Hooks iniciales (primeros 3 segundos)\n- Ritmo del discurso\n- Tipo de storytelling\n- Emociones generadas\n- Estructura (problema → tensión → solución → CTA)\n\n----------------------------------\n\nINSTRUCCIONES:\n\nGenera EXACTAMENTE 10 ideas de contenido.\n\nCada idea debe incluir:\n\n1. \"title\" → Título viral en MAYÚSCULAS (máx 10 palabras)\n2. \"hook\" → Primera frase ultra adictiva (clave para retención)\n3. \"full_script\" → Guión completo listo para grabar (máx 30-45 segundos)\n4. \"copy\" → Texto para Instagram (optimizado para engagement)\n5. \"hashtags\" → Array de 6 hashtags relevantes y virales\n\n----------------------------------\n\nIMPORTANTE:\n\n- NO expliques nada\n- NO uses markdown\n- SOLO devuelve JSON válido\n\nFormato exacto:\n\n{\n  \"ideas\": [\n    {\n      \"title\": \"...\",\n      \"hook\": \"...\",\n      \"full_script\": \"...\",\n      \"copy\": \"...\",\n      \"hashtags\": [\"...\", \"...\", \"...\", \"...\", \"...\", \"...\"]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "87e2e744-29ae-450a-8b15-d276b7b50e13",
+      "name": "OpenAI Generador",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "8lgcaFH4RanfXIZr",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "actorId": {
+          "__rl": true,
+          "value": "xMc5Ga1oCONPmWJIa",
+          "mode": "list",
+          "cachedResultName": "Instagram Reel Scraper (apify/instagram-reel-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/xMc5Ga1oCONPmWJIa/input"
+        },
+        "customBody": "{\n    \"includeDownloadedVideo\": false,\n    \"includeSharesCount\": false,\n    \"includeTranscript\": false,\n    \"resultsLimit\": 10,\n    \"skipPinnedPosts\": false,\n    \"username\": [\n        \"criptomonedas_es\",\n        \"cripto.willy\",\n        \"cryptoprofe\"\n    ]\n}",
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e086088b-4142-4112-bec6-98c20f59d575",
+      "name": "Run an Actor"
+    },
+    {
+      "parameters": {
+        "operation": "Get last run",
+        "userActorId": {
+          "__rl": true,
+          "value": "={{ $json.actId }}",
+          "mode": "id"
+        },
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "7a27d618-8bef-4af3-8a30-71719216a3e6",
+      "name": "Get last run"
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}",
+        "limit": 10,
+        "options": {},
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "488a644a-80fa-455e-8e10-62b0d3223598",
+      "name": "Get dataset items"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  if (item.binary && item.binary.data) {\n    item.binary.data.fileName = 'video.mp4';\n    item.binary.data.mimeType = 'video/mp4';\n    item.binary.data.fileExtension = 'mp4';\n  }\n}\nreturn $input.all();"
+      },
+      "id": "4466e321-c752-4200-a6f8-47452a5fcf93",
+      "name": "Code: Fix Binary Name",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "es"
+        }
+      },
+      "id": "be7a9d47-5988-4168-b448-6945e9ab9955",
+      "name": "Transcribir Audio (Whisper)1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1568,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "8lgcaFH4RanfXIZr",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentTemplateId": "6E9979AF-5BD8-4004-A1A0-8E5CE36CFFCD",
+        "payloadInputMethod": "keyValuePairs",
+        "payloadKeyValues": {
+          "values": [
+            {
+              "key": "ideas",
+              "value": "={{ $json.ideas }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-pdfmonkey.pdfMonkey",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        0
+      ],
+      "id": "ea34d8a1-433c-412e-9482-32c3a200e5a2",
+      "name": "PDFMonkey"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraemos la lista de ideas directamente de la respuesta de OpenAI\nconst ideas = $input.all()[0].json.message.content.ideas;\n\n// Devolvemos un único objeto con la lista limpia\nreturn {\n  ideas: ideas\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        0
+      ],
+      "id": "3eccb36a-3c82-4020-909c-c9d8a1cbe256",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://springfield-opponents-reid-mpg.trycloudflare.com/api/webhooks/n8n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"projectId\": \"{{ $('Webhook Trigger').first().json.body.projectId }}\",\n  \"status\": \"COMPLETED\",\n  \"pdfUrl\": \"{{ $json.document_card.download_url }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3024,
+        0
+      ],
+      "id": "04eee770-f677-4ef6-ba0b-22c3393e4be2",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {
+    "PDFMonkey": [
+      {
+        "json": {
+          "document_card": {
+            "app_id": "84d31bfb-8007-4e23-96d6-ef4e74d07ac1",
+            "created_at": "2026-04-14T15:26:54.508+02:00",
+            "id": "374f524f-4bdd-47a5-85af-9ba0c259c052",
+            "meta": "{}",
+            "output_type": "pdf",
+            "status": "success",
+            "updated_at": "2026-04-14T15:26:56.379+02:00",
+            "document_template_id": "6e9979af-5bd8-4004-a1a0-8e5ce36cffcd",
+            "document_template_identifier": "Contenido Viral",
+            "download_url": "https://pdfmonkey-store.s3.eu-west-3.amazonaws.com/production/backend/document/374f524f-4bdd-47a5-85af-9ba0c259c052/v5-6rt7p94ry57.pdf?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2DEHCSJKRKT25747%2F20260414%2Feu-west-3%2Fs3%2Faws4_request&X-Amz-Date=20260414T132656Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=c933d1ae48f15607e522eb0230ee581a1fc710d797e8578bb8ea9187f3723f21",
+            "failure_cause": null,
+            "filename": "v5-6rt7p94ry57.pdf",
+            "preview_url": "https://preview.pdfmonkey.io/pdf/web/viewer.html?file=https%3A%2F%2Fpreview.pdfmonkey.io%2Fdocument-render%2F374f524f-4bdd-47a5-85af-9ba0c259c052%2FQCFx58wzvTYRBYxBo4EXQGr7nADS_Azc",
+            "public_share_link": null
+          }
+        },
+        "binary": {
+          "data": {
+            "mimeType": "application/pdf",
+            "fileType": "pdf",
+            "fileExtension": "pdf",
+            "data": "filesystem-v2",
+            "fileName": "v5-6rt7p94ry57.pdf",
+            "id": "filesystem-v2:workflows/tdLEMGYB56VucwFG/executions/106/binary_data/a51f7f69-780e-4dcc-864a-f1cbc32eae3b",
+            "fileSize": "200 kB",
+            "bytes": 199825
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: Filter Viral Score": {
+      "main": [
+        [
+          {
+            "node": "HTTP Download Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Download Video": {
+      "main": [
+        [
+          {
+            "node": "Code: Fix Binary Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge By Index": {
+      "main": [
+        [
+          {
+            "node": "Code: Aggregate Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: Aggregate Text": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Generador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Generador": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor": {
+      "main": [
+        [
+          {
+            "node": "Get last run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get last run": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items": {
+      "main": [
+        [
+          {
+            "node": "Code: Filter Viral Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: Fix Binary Name": {
+      "main": [
+        [
+          {
+            "node": "Transcribir Audio (Whisper)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribir Audio (Whisper)1": {
+      "main": [
+        [
+          {
+            "node": "Merge By Index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDFMonkey": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "PDFMonkey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "38c47598-901d-4b6c-b702-dd7292d43eb0",
+  "meta": {
+    "instanceId": "466b81894deedf7b7f89c0d763ea56890e67895259a64ac496c39c1749b38d28"
+  },
+  "id": "afuCbwZlBH6iQJZK",
+  "tags": []
+}

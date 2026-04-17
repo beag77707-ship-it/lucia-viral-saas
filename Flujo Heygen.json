@@ -1,0 +1,198 @@
+{
+  "name": "HeyGen Premium Avatar Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "heygen-upload",
+        "options": {}
+      },
+      "id": "638a9b22-8b82-4d65-8ebf-0f102b905160",
+      "name": "Webhook: Files Uploaded",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        64
+      ],
+      "webhookId": "d14f9993-eeaf-488d-b843-5557d1ff5cec"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "heygen-activate",
+        "options": {}
+      },
+      "id": "ca6b91ea-74e4-411d-9d29-a24a42d56692",
+      "name": "Webhook: Start Generation",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        304
+      ],
+      "webhookId": "0b646822-8fc4-4f05-a91c-11f04f8a9f20"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.ideas",
+        "options": {}
+      },
+      "id": "09a84336-125a-40be-83c7-87f58d0fbe95",
+      "name": "Split Ideas",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $node['Webhook: Start Generation'].json.body.avatarId }}\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"6c647ade8e5b4875b0b1e5ef2c8d71e8\",\n        \"speed\": 1.1\n      },\n      \"background\": {\n        \"type\": \"image\",\n        \"url\": \"{{ $json.suggested_scenario === 'office' ? 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'living-room' ? 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'studio' ? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'nature' ? 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=1280' : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1280'))) }}\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
+        "options": {}
+      },
+      "id": "b2631f19-0810-44bc-983c-c9a53b1a48c2",
+      "name": "HeyGen Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        288,
+        304
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eR85dyjbMnOkCEB3",
+          "name": "Heygen prueba"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lucia-viral-saas.vercel.app/api/webhooks/reels",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "projectId",
+              "value": "={{$node[\"Webhook: Start Generation\"].json.body.projectId}}"
+            },
+            {
+              "name": "title",
+              "value": "={{$node[\"Split Ideas\"].json[\"title\"]}}"
+            },
+            {
+              "name": "script",
+              "value": "={{$node[\"Split Ideas\"].json[\"full_script\"]}}"
+            },
+            {
+              "name": "videoUrl",
+              "value": "={{$json.data.video_url}}"
+            },
+            {
+              "name": "status",
+              "value": "COMPLETED"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f8bac7f0-fbc6-4a7a-9ba8-19047fa20d69",
+      "name": "Update Web Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        736,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "id": "63d89397-eb33-4311-b5ee-1f883a24d59f",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        304
+      ],
+      "webhookId": "94a5721a-d260-4170-b2b0-ca141e5c4ec6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook: Start Generation": {
+      "main": [
+        [
+          {
+            "node": "Split Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Ideas": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Generate Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HeyGen Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Update Web Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f2ff4abe-9d43-4103-affa-ae4b625bbc21",
+  "meta": {
+    "instanceId": "466b81894deedf7b7f89c0d763ea56890e67895259a64ac496c39c1749b38d28"
+  },
+  "id": "CSRj1k3tDvVH4QVu",
+  "tags": []
+}

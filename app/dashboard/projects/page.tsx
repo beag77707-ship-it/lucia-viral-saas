@@ -17,6 +17,9 @@ export default async function ProjectsPage() {
       userId: (session.user as any).id,
       status: "COMPLETED"
     },
+    include: {
+      videos: true
+    },
     orderBy: { createdAt: "desc" },
   });
 

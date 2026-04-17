@@ -1,10 +1,12 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { FileDown, Calendar, Hash, Video, Settings, PlayCircle, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileDown, Calendar, Hash, Video, Settings, PlayCircle, Loader2, X, Film } from "lucide-react";
 import { generatePDF } from "@/lib/pdfGenerator";
+import ReelsGallery from "./ReelsGallery";
 
 export default function ProjectGrid({ initialProjects }: { initialProjects: any[] }) {
+  const [selectedProjectForVideos, setSelectedProjectForVideos] = useState<any | null>(null);
+
   if (initialProjects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -78,22 +80,31 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
               </div>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-white/5">
+            <div className="mt-auto pt-4 border-t border-white/5 space-y-2">
               {isCompleted ? (
-                <button
-                  onClick={() => {
-                    console.log("Downloading project:", project.id, "Data:", projectData);
-                    if (project.pdfUrl) {
-                      window.open(project.pdfUrl, '_blank');
-                    } else {
-                      generatePDF(projectData);
-                    }
-                  }}
-                  className="w-full flex items-center justify-center gap-2 bg-foreground text-background py-2.5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
-                >
-                  <FileDown className="w-4 h-4" />
-                  Descargar PDF
-                </button>
+                <>
+                  <button
+                    onClick={() => setSelectedProjectForVideos(project)}
+                    className="w-full flex items-center justify-center gap-2 bg-primary/20 text-primary py-2.5 rounded-lg font-bold transition-all hover:bg-primary/30 active:scale-95 border border-primary/20"
+                  >
+                    <Film className="w-4 h-4" />
+                    Ver Reels ({project.videos?.length || 0})
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log("Downloading project:", project.id, "Data:", projectData);
+                      if (project.pdfUrl) {
+                        window.open(project.pdfUrl, '_blank');
+                      } else {
+                        generatePDF(projectData);
+                      }
+                    }}
+                    className="w-full flex items-center justify-center gap-2 bg-foreground text-background py-2.5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
+                  >
+                    <FileDown className="w-4 h-4" />
+                    Descargar PDF
+                  </button>
+                </>
               ) : (
                 <button
                   disabled
@@ -107,6 +118,38 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
           </motion.div>
         );
       })}
+
+      <AnimatePresence>
+        {selectedProjectForVideos && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-dark-900 border border-white/10 w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] p-8 relative shadow-2xl"
+            >
+              <button
+                onClick={() => setSelectedProjectForVideos(null)}
+                className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="mb-8">
+                <h3 className="text-3xl font-black text-white italic tracking-tight mb-2">REELS GENERADOS</h3>
+                <p className="text-gray-400">Proyecto: <span className="text-primary font-bold">{selectedProjectForVideos.niche}</span></p>
+              </div>
+
+              <ReelsGallery videos={selectedProjectForVideos.videos} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
