@@ -1,8 +1,6 @@
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
 import ProjectGrid from "../../../components/ProjectGrid";
+
+export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage() {
   const session = await getServerSession(authOptions);
@@ -14,8 +12,7 @@ export default async function ProjectsPage() {
   // Obtenemos los proyectos de Prisma de los más nuevos a los más antiguos
   const projects = await prisma.project.findMany({
     where: { 
-      userId: (session.user as any).id,
-      status: "COMPLETED"
+      userId: (session.user as any).id
     },
     include: {
       videos: true

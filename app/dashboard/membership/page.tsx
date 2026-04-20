@@ -1,9 +1,6 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import AvatarForm from "@/components/AvatarForm";
-import { ArrowLeft, UserCircle, HelpCircle, Key, CheckCircle2, ChevronRight, Video, Mic, User } from "lucide-react";
 import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AvatarConfigPage() {
   const session = await getServerSession(authOptions);
@@ -19,8 +16,7 @@ export default async function AvatarConfigPage() {
 
   const projects = await prisma.project.findMany({
     where: { 
-      userId: (session.user as any).id,
-      status: "COMPLETED" 
+      userId: (session.user as any).id
     },
     orderBy: { createdAt: 'desc' },
     select: { id: true, niche: true }

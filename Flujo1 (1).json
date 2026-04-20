@@ -280,24 +280,6 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://localhost:5678/webhook/heygen-activate",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"projectId\": \"{{$node['Webhook Trigger'].json.body.projectId}}\",\n  \"userId\": \"{{$node['Webhook Trigger'].json.body.userId}}\",\n  \"avatarId\": \"{{$node['Webhook Trigger'].json.body.heygenAvatarId}}\",\n  \"selectedScenarios\": \"{{$node['Webhook Trigger'].json.body.selectedScenarios}}\",\n  \"ideas\": {{ JSON.stringify($node['Code in JavaScript'].json.ideas) }}\n}",
-        "options": {}
-      },
-      "id": "3be760aa-95ab-4c83-8093-eb47b7adb117",
-      "name": "Trigger HeyGen",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        8672,
-        1344
-      ]
-    },
-    {
-      "parameters": {
         "jsCode": "// 1. Buscamos los datos de forma flexible (no importa el nombre del nodo anterior)\nconst data = $input.all()[0].json;\n\n// 2. Intentamos encontrar la URL en cualquier formato que PDFMonkey decida enviarla\nconst doc = data.document_card || data.document || data;\nconst rawUrl = doc.download_url || (data.documents && data.documents[0] ? data.documents[0].download_url : null);\n\nif (!rawUrl) {\n  throw new Error(\"No se encontró la URL del PDF. Revisa la salida del nodo anterior.\");\n}\n\n// 3. Limpiamos solo lo necesario\nconst cleanUrl = rawUrl.split('?')[0];\n\nreturn {\n  pdfUrl: cleanUrl,\n  documentId: doc.id || data.id\n};\n"
       },
       "id": "f8707761-9965-486f-a14c-2192de15c061",
@@ -3032,13 +3014,7 @@
     },
     "Sync with App": {
       "main": [
-        [
-          {
-            "node": "Trigger HeyGen",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "PDFMonkey": {
