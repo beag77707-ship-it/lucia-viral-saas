@@ -42,40 +42,58 @@ export default async function AvatarConfigPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Side: Simple Steps */}
-        <div className="space-y-6">
+          {/* Avatar Steps */}
           <div className="bg-card border border-border p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <CheckCircle2 className="text-primary w-5 h-5" /> Pasos a seguir
+              <CheckCircle2 className="text-primary w-5 h-5" /> Pasos para el Avatar
             </h2>
             
-            <div className="space-y-8">
+            <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-lg">1</div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-sm">1</div>
                 <div>
-                  <p className="text-white font-bold text-sm mb-1">Crea tu Avatar en HeyGen</p>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    Entra en <a href="https://app.heygen.com" target="_blank" className="text-primary hover:underline">HeyGen.com</a> y crea un <span className="text-white font-semibold">"Instant Avatar"</span>. Graba el vídeo de consentimiento leyendo el texto de seguridad que ellos te den.
+                  <p className="text-white font-bold text-xs mb-1">Crea tu "Instant Avatar"</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    En HeyGen, crea un <span className="text-white">Instant Avatar</span> y graba tu vídeo de consentimiento.
                   </p>
                 </div>
               </div>
               
               <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-lg">2</div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-sm">2</div>
                 <div>
-                  <p className="text-white font-bold text-sm mb-1">Copia el ID del Avatar</p>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    Una vez aprobado, haz clic en los <span className="text-white font-semibold">tres puntos (...)</span> del avatar en HeyGen y selecciona <span className="bg-primary/20 text-primary px-2 py-0.5 rounded font-mono">Copy ID</span>.
+                  <p className="text-white font-bold text-xs mb-1">Copia el Avatar ID</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    En los <span className="text-white">...</span> del avatar, dale a <span className="text-primary">Copy ID</span>.
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
 
+          {/* Voice Steps */}
+          <div className="bg-card border border-border p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Mic className="text-primary w-5 h-5" /> Pasos para la Voz
+            </h2>
+            
+            <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-lg">3</div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-sm">1</div>
                 <div>
-                  <p className="text-white font-bold text-sm mb-1">Pégalo en el formulario</p>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    Pega el código en el recuadro de la derecha y elige tu proyecto. ¡Y listo! Tu flujo ya usará ese avatar.
+                  <p className="text-white font-bold text-xs mb-1">Clona tu Voz</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    Ve a <span className="text-white">Voices -> Personal Voice -> Create a Voice</span>. Sube un audio tuyo de 1 min.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary flex-shrink-0 text-sm">2</div>
+                <div>
+                  <p className="text-white font-bold text-xs mb-1">Copia el Voice ID</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    Una vez creada, clica en la voz y copia el <span className="text-primary">Voice ID</span> que aparece en su panel.
                   </p>
                 </div>
               </div>
