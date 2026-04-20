@@ -66,17 +66,6 @@ export default function ReelsGallery({ videos }: { videos: any[] }) {
                 </p>
               </div>
               
-              <div className="flex items-center justify-between py-2 border-y border-white/5">
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Escenario</span>
-                  <span className="text-xs text-primary font-semibold">{video.scenario || "Marketing"}</span>
-                </div>
-                <div className="h-7 px-2.5 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-[10px] text-green-400 font-bold">LISTO</span>
-                </div>
-              </div>
-
               <a 
                 href={video.videoUrl} 
                 download 

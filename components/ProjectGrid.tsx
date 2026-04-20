@@ -86,24 +86,7 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
               </span>
             </div>
 
-            <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-1">{project.niche || "Sin nicho"}</h3>
-            
-            <div className="flex-1 space-y-3 mb-6">
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Competidores Analizados:</p>
-                <div className="flex flex-wrap gap-2">
-                  {(() => {
-                    let comps = [];
-                    try { comps = JSON.parse(project.competitors); } catch(e) {}
-                    return comps.map((c: string, i: number) => (
-                      <span key={i} className="text-xs bg-white/5 text-gray-300 px-2 py-1 rounded inline-flex items-center gap-1 border border-white/5">
-                        <Hash className="w-3 h-3 text-primary" /> {c.replace("@", "")}
-                      </span>
-                    ));
-                  })()}
-                </div>
-              </div>
-            </div>
+            <h3 className="text-xl font-bold text-foreground mb-4 line-clamp-1">{project.niche || "Sin nicho"}</h3>
 
             <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
               {isCompleted ? (

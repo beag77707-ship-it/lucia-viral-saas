@@ -47,7 +47,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"PON_AQUI_TU_ID_DE_AVATAR\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"003e0cd14d0c427387cc728a011030e4\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $(\"Webhook: Start Generation\").first().json.body.avatarId }}\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"003e0cd14d0c427387cc728a011030e4\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
         "options": {}
       },
       "id": "node-generate",
@@ -105,7 +105,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1100,
+        1080,
         300
       ]
     },
@@ -125,7 +125,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1100,
+        1080,
         450
       ]
     },
@@ -135,7 +135,7 @@
         "url": "https://lucia-viral-saas.vercel.app/api/webhooks/reels",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation1\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas1\").json[\"title\"] }}\",\n  \"script\": \"{{ $(\"Split Ideas1\").json[\"full_script\"] }}\",\n  \"videoUrl\": \"{{ $json.data.video_url }}\",\n  \"status\": \"COMPLETED\"\n}",
+        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas\").json[\"title\"] }}\",\n  \"script\": \"{{ $(\"Split Ideas\").json[\"full_script\"] }}\",\n  \"videoUrl\": \"{{ $json.data.video_url }}\",\n  \"status\": \"COMPLETED\"\n}",
         "options": {}
       },
       "id": "node-sync-ok",
@@ -153,7 +153,7 @@
         "url": "https://lucia-viral-saas.vercel.app/api/webhooks/reels",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation1\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas1\").json[\"title\"] }}\",\n  \"errorMessage\": \"{{ $json.data.error.message }}\",\n  \"status\": \"FAILED\"\n}",
+        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas\").json[\"title\"] }}\",\n  \"errorMessage\": \"{{ $json.data.error.message }}\",\n  \"status\": \"FAILED\"\n}",
         "options": {}
       },
       "id": "node-sync-fail",

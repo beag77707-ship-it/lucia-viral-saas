@@ -37,14 +37,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No se encontró el proyecto para procesar" }, { status: 404 });
     }
 
-    // 2. Actualizar el usuario con el ID del avatar
-    await prisma.user.update({
+    // 2. Obtener el usuario para sacar su Avatar ID guardado si no se envía uno
+    const user = await prisma.user.update({
       where: { email: emailToUpdate },
       data: {
-        heygenAvatarId: avatarId,
         heygenStatus: "GENERATING_VIDEOS",
       }
     });
+
+    const finalAvatarId = avatarId || user.heygenAvatarId;
+
+    if (!finalAvatarId) {
+      return NextResponse.json({ 
+        error: "No tienes un Avatar ID configurado. Ve a 'Configurar Avatar' primero." 
+      }, { status: 400 });
+    }
 
     // 3. Disparar flujo de generación de videos en n8n
     // Usamos webhook-test para que puedas verlo en tiempo real mientras lo tienes abierto
@@ -73,7 +80,7 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           type: "START_VIDEO_GENERATION",
           userId: targetProject.userId,
-          avatarId: avatarId || "HARDCODED_IN_N8N",
+          avatarId: finalAvatarId,
           projectId: targetProject.id,
           ideas: ideasPayload // Ahora siempre es el array directo [...]
         }),

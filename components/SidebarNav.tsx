@@ -10,7 +10,7 @@ export default function SidebarNav() {
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/dashboard/projects", label: "Mis Proyectos", icon: Video },
-    { href: "/dashboard/membership", label: "Mi Avatar / Pro", icon: CheckCircle2 },
+    { href: "/dashboard/membership", label: "Configurar Avatar", icon: CheckCircle2 },
     { href: "/dashboard/settings", label: "Configuración", icon: Settings },
   ];
 
