@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     console.log("--- N8N Reel Webhook Received ---");
     console.log(JSON.stringify(body, null, 2));
 
-    const { projectId, title, script, videoUrl, scenario, status } = body;
+    const { projectId, title, script, videoUrl, scenario, status, errorMessage } = body;
 
     if (!projectId) {
       return NextResponse.json({ error: "Missing projectId" }, { status: 400 });
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
         videoUrl,
         scenario,
         status: status || "COMPLETED",
+        errorMessage,
       },
     });
 

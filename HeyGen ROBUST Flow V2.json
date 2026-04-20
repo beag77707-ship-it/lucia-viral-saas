@@ -1,0 +1,262 @@
+{
+  "name": "HeyGen Premium Avatar Flow - ROBUST V2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "heygen-activate",
+        "options": {}
+      },
+      "id": "node-webhook",
+      "name": "Webhook: Start Generation",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.ideas",
+        "options": {}
+      },
+      "id": "node-split",
+      "name": "Split Ideas",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"PON_AQUI_TU_ID_DE_AVATAR\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"003e0cd14d0c427387cc728a011030e4\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
+        "options": {}
+      },
+      "id": "node-generate",
+      "name": "HeyGen Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "id": "node-wait",
+      "name": "Wait 2m",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.heygen.com/v2/video_status?video_id={{ $node[\"HeyGen Generate Video\"].json.data.video_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "node-status",
+      "name": "HeyGen Get Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.data.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "id": "node-if-done",
+      "name": "Is Completed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.data.status }}",
+              "value2": "failed"
+            }
+          ]
+        }
+      },
+      "id": "node-if-fail",
+      "name": "Is Failed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lucia-viral-saas.vercel.app/api/webhooks/reels",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation1\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas1\").json[\"title\"] }}\",\n  \"script\": \"{{ $(\"Split Ideas1\").json[\"full_script\"] }}\",\n  \"videoUrl\": \"{{ $json.data.video_url }}\",\n  \"status\": \"COMPLETED\"\n}",
+        "options": {}
+      },
+      "id": "node-sync-ok",
+      "name": "Sync Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1350,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lucia-viral-saas.vercel.app/api/webhooks/reels",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation1\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas1\").json[\"title\"] }}\",\n  \"errorMessage\": \"{{ $json.data.error.message }}\",\n  \"status\": \"FAILED\"\n}",
+        "options": {}
+      },
+      "id": "node-sync-fail",
+      "name": "Sync Failure",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1350,
+        450
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Start Generation": {
+      "main": [
+        [
+          {
+            "node": "Split Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Ideas": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Generate Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HeyGen Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Wait 2m",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2m": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Get Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HeyGen Get Status": {
+      "main": [
+        [
+          {
+            "node": "Is Completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Completed?": {
+      "main": [
+        [
+          {
+            "node": "Sync Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Failed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Failed?": {
+      "main": [
+        [
+          {
+            "node": "Sync Failure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 2m",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

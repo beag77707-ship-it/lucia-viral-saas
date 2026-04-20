@@ -48,6 +48,7 @@ model Video {
   videoUrl    String?
   scenario    String?
   status      String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  errorMessage String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
