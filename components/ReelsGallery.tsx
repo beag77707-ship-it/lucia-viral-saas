@@ -31,12 +31,13 @@ export default function ReelsGallery({ videos }: { videos: any[] }) {
         {videos.map((video, idx) => (
           <motion.div
             key={video.id || idx}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="group relative bg-dark-800 rounded-3xl overflow-hidden border border-white/10 hover:border-primary/50 transition-all shadow-lg"
+            className="group bg-dark-800/80 backdrop-blur-xl rounded-[2rem] overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-500 shadow-2xl flex flex-col"
           >
-            <div className="aspect-[9/16] relative bg-black">
+            {/* Video Preview Section */}
+            <div className="aspect-[9/16] relative bg-black/40 group-hover:bg-black/20 transition-colors">
               {video.videoUrl ? (
                 <video 
                   src={video.videoUrl} 
@@ -45,36 +46,47 @@ export default function ReelsGallery({ videos }: { videos: any[] }) {
                   preload="metadata"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-dark-900 animate-pulse">
-                  <Film className="w-10 h-10 text-gray-700" />
+                <div className="w-full h-full flex flex-col items-center justify-center bg-dark-900/50 gap-4">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+                    <Film className="w-8 h-8 text-primary/40" />
+                  </div>
+                  <span className="text-xs text-gray-500 font-medium">Procesando vídeo...</span>
                 </div>
               )}
-              
-              {/* Overlay with info */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
-                <h4 className="font-bold text-white mb-1 line-clamp-1">{video.title || "Sin título"}</h4>
-                <p className="text-[10px] text-gray-400 mb-4 line-clamp-2 italic">"{video.script || "Guion generado"}"</p>
-                
-                <a 
-                  href={video.videoUrl} 
-                  download 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-white text-black text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all transform active:scale-95"
-                >
-                  <Download className="w-4 h-4" /> Descargar Reel
-                </a>
-              </div>
             </div>
-            
-            <div className="p-4 flex items-center justify-between border-t border-white/5">
+
+            {/* Content & Actions Section */}
+            <div className="p-5 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+              <div className="space-y-1">
+                <h4 className="font-bold text-white line-clamp-1 group-hover:text-primary transition-colors">
+                  {video.title || "Sin título"}
+                </h4>
+                <p className="text-[11px] text-gray-400 line-clamp-2 leading-relaxed italic">
+                  "{video.script || "Guion generado"}"
+                </p>
+              </div>
+              
+              <div className="flex items-center justify-between py-2 border-y border-white/5">
                 <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Escenario</span>
-                    <span className="text-xs text-primary font-medium">{video.scenario || "Contextual"}</span>
+                  <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Escenario</span>
+                  <span className="text-xs text-primary font-semibold">{video.scenario || "Marketing"}</span>
                 </div>
-                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                <div className="h-7 px-2.5 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[10px] text-green-400 font-bold">LISTO</span>
                 </div>
+              </div>
+
+              <a 
+                href={video.videoUrl} 
+                download 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-primary hover:bg-primary-600 text-white text-xs font-black py-4 rounded-2xl flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] shadow-lg shadow-primary/20 hover:shadow-primary/40"
+              >
+                <Download className="w-4 h-4" /> 
+                DESCARGAR REEL IA
+              </a>
             </div>
           </motion.div>
         ))}
