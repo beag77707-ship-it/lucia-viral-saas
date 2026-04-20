@@ -8,6 +8,32 @@ import ReelsGallery from "./ReelsGallery";
 
 export default function ProjectGrid({ initialProjects }: { initialProjects: any[] }) {
   const [selectedProjectForVideos, setSelectedProjectForVideos] = useState<any | null>(null);
+  const [activatingProjectId, setActivatingProjectId] = useState<string | null>(null);
+
+  const handleGenerateVideos = async (projectId: string) => {
+    const avatarId = prompt("Ingresa el ID de tu Avatar de HeyGen:");
+    if (!avatarId) return;
+
+    setActivatingProjectId(projectId);
+    try {
+      const res = await fetch("/api/premium/activate-avatar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, avatarId }),
+      });
+      
+      if (res.ok) {
+        alert("¡Generación de vídeos iniciada! En unos 20-40 min estarán listos.");
+      } else {
+        const data = await res.json();
+        alert("Error: " + (data.error || "No se pudo iniciar"));
+      }
+    } catch (error) {
+      alert("Error de conexión");
+    } finally {
+      setActivatingProjectId(null);
+    }
+  };
 
   if (initialProjects.length === 0) {
     return (
@@ -101,6 +127,19 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
                   >
                     <FileDown className="w-4 h-4" />
                     📥 Descargar Reporte PDF
+                  </button>
+
+                  <button
+                    onClick={() => handleGenerateVideos(project.id)}
+                    disabled={activatingProjectId === project.id}
+                    className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-500/20 disabled:opacity-50"
+                  >
+                    {activatingProjectId === project.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Video className="w-4 h-4" />
+                    )}
+                    🎬 Crear Vídeos IA
                   </button>
                 </>
               ) : (
