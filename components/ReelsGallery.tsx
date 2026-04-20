@@ -42,7 +42,7 @@ export default function ReelsGallery({ videos }: { videos: any[] }) {
                   src={video.videoUrl} 
                   className="w-full h-full object-cover"
                   controls
-                  poster="/video-placeholder.png"
+                  preload="metadata"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-dark-900 animate-pulse">
@@ -58,6 +58,8 @@ export default function ReelsGallery({ videos }: { videos: any[] }) {
                 <a 
                   href={video.videoUrl} 
                   download 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full bg-white text-black text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all transform active:scale-95"
                 >
                   <Download className="w-4 h-4" /> Descargar Reel
