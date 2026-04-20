@@ -15,6 +15,7 @@ model User {
   image           String?
   plan            String    @default("BASIC")
   heygenAvatarId  String?
+  heygenVoiceId   String?
   heygenVideoUrl  String?
   heygenStatus    String    @default("IDLE")
   selectedScenarios String?   // Guardaremos ["office", "nature", ...] como JSON

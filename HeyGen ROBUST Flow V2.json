@@ -47,7 +47,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $(\"Webhook: Start Generation\").first().json.body.avatarId }}\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"003e0cd14d0c427387cc728a011030e4\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $(\"Webhook: Start Generation\").first().json.body.avatarId }}\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"{{ $(\"Webhook: Start Generation\").first().json.body.voiceId }}\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
         "options": {}
       },
       "id": "node-generate",

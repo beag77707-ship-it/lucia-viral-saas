@@ -10,15 +10,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { avatarId } = await req.json();
-
-    if (!avatarId) {
-      return NextResponse.json({ error: "Missing avatarId" }, { status: 400 });
-    }
+    const { avatarId, voiceId } = await req.json();
 
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email! },
-      data: { heygenAvatarId: avatarId },
+      data: { 
+        heygenAvatarId: avatarId,
+        heygenVoiceId: voiceId 
+      },
     });
 
     return NextResponse.json({ message: "Avatar ID updated", avatarId: updatedUser.heygenAvatarId });

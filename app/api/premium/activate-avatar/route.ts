@@ -46,10 +46,11 @@ export async function POST(req: Request) {
     });
 
     const finalAvatarId = avatarId || user.heygenAvatarId;
+    const finalVoiceId = voiceId || user.heygenVoiceId || "003e0cd14d0c427387cc728a011030e4";
 
     if (!finalAvatarId) {
       return NextResponse.json({ 
-        error: "No tienes un Avatar ID configurado. Ve a 'Configurar Avatar' primero." 
+        error: "No tienes un Avatar ID configurado. Elige uno en esta página antes de crear reels." 
       }, { status: 400 });
     }
 
@@ -81,6 +82,7 @@ export async function POST(req: Request) {
           type: "START_VIDEO_GENERATION",
           userId: targetProject.userId,
           avatarId: finalAvatarId,
+          voiceId: finalVoiceId,
           projectId: targetProject.id,
           ideas: ideasPayload // Ahora siempre es el array directo [...]
         }),

@@ -9,7 +9,16 @@ export default async function AvatarConfigPage() {
   const session = await getServerSession(authOptions);
   const user = await prisma.user.findUnique({
     where: { email: session?.user?.email! },
-    select: { heygenAvatarId: true }
+    select: { heygenAvatarId: true, heygenVoiceId: true }
+  });
+
+  const projects = await prisma.project.findMany({
+    where: { 
+      userId: (session?.user as any).id,
+      status: "COMPLETED" 
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, niche: true }
   });
 
   return (
@@ -76,7 +85,11 @@ export default async function AvatarConfigPage() {
               <Key className="text-primary w-5 h-5" /> Configuración
             </h2>
             
-            <AvatarForm initialId={user?.heygenAvatarId || ""} />
+            <AvatarForm 
+              initialId={user?.heygenAvatarId || ""} 
+              initialVoiceId={user?.heygenVoiceId || ""}
+              projects={projects}
+            />
             
             <div className="mt-8 pt-6 border-t border-white/5">
                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-4">Estado del Flujo</p>
