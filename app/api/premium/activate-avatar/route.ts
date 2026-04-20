@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { avatarId, targetUserEmail, projectId } = await req.json();
+    const { avatarId, voiceId, targetUserEmail, projectId } = await req.json();
 
     // El ID es opcional ahora porque el usuario dice que ya está en n8n
 
