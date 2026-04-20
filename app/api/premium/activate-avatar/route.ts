@@ -56,6 +56,10 @@ export async function POST(req: Request) {
       if (typeof ideasPayload === 'string') {
         ideasPayload = JSON.parse(ideasPayload);
       }
+      // Si el JSON tiene la forma { ideas: [...] }, extraemos solo el array
+      if (ideasPayload && typeof ideasPayload === 'object' && !Array.isArray(ideasPayload) && (ideasPayload as any).ideas) {
+        ideasPayload = (ideasPayload as any).ideas;
+      }
     } catch (e) {
       console.error("Error parsing resultJSON:", e);
     }
@@ -71,7 +75,7 @@ export async function POST(req: Request) {
           userId: targetProject.userId,
           avatarId: avatarId || "HARDCODED_IN_N8N",
           projectId: targetProject.id,
-          ideas: ideasPayload
+          ideas: ideasPayload // Ahora siempre es el array directo [...]
         }),
       });
 

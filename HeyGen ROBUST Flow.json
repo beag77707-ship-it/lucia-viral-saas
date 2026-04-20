@@ -1,0 +1,218 @@
+{
+  "name": "HeyGen Premium Avatar Flow - ROBUST",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "heygen-activate",
+        "options": {}
+      },
+      "id": "webhook-start",
+      "name": "Webhook: Start Generation",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.ideas",
+        "options": {}
+      },
+      "id": "split-ideas",
+      "name": "Split Ideas",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"ea20d88195864380a9d07399f667f33d\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"00c8330722cc47a499d3013897b91950\",\n        \"speed\": 1.1\n      },\n      \"background\": {\n        \"type\": \"image\",\n        \"url\": \"{{ $json.suggested_scenario === 'office' ? 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'living-room' ? 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'studio' ? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'nature' ? 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=1280' : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1280'))) }}\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
+        "options": {}
+      },
+      "id": "heygen-generate",
+      "name": "HeyGen Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eR85dyjbMnOkCEB3",
+          "name": "Heygen API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "id": "wait-node",
+      "name": "Wait 2m",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.heygen.com/v2/video_status?video_id={{ $node[\"HeyGen Generate Video\"].json.data.video_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "heygen-status",
+      "name": "HeyGen Get Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1150,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eR85dyjbMnOkCEB3",
+          "name": "Heygen API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.data.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "id": "if-completed",
+      "name": "Is Completed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lucia-viral-saas.vercel.app/api/webhooks/reels",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"projectId\": \"{{ $(\"Webhook: Start Generation\").first().json.body.projectId }}\",\n  \"title\": \"{{ $(\"Split Ideas\").json[\"title\"] }}\",\n  \"script\": \"{{ $(\"Split Ideas\").json[\"full_script\"] }}\",\n  \"videoUrl\": \"{{ $json.data.video_url }}\",\n  \"scenario\": \"{{ $(\"Split Ideas\").json[\"suggested_scenario\"] }}\",\n  \"status\": \"COMPLETED\"\n}",
+        "options": {}
+      },
+      "id": "sync-web",
+      "name": "Sync with Web",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1650,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Start Generation": {
+      "main": [
+        [
+          {
+            "node": "Split Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Ideas": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Generate Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HeyGen Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Wait 2m",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2m": {
+      "main": [
+        [
+          {
+            "node": "HeyGen Get Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HeyGen Get Status": {
+      "main": [
+        [
+          {
+            "node": "Is Completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Completed?": {
+      "main": [
+        [
+          {
+            "node": "Sync with Web",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 2m",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
