@@ -48,8 +48,8 @@ export async function POST(req: Request) {
 
     // 3. Disparar flujo de generación de videos en n8n
     // Usamos webhook-test para que puedas verlo en tiempo real mientras lo tienes abierto
-    // He añadido el puerto 5678 que es el estándar de n8n y el que parece que usas
-    const n8nHeygenUrl = "http://vmi3229350.contaboserver.net:5678/webhook-test/heygen-activate";
+    // Volvemos a HTTPS sin puerto porque es el que sabemos que funciona en tu Contabo
+    const n8nHeygenUrl = "https://vmi3229350.contaboserver.net/webhook-test/heygen-activate";
     
     let ideasPayload = targetProject.resultJSON;
     try {
