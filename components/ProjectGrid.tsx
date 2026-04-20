@@ -94,17 +94,13 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
                   </button>
                   <button
                     onClick={() => {
-                      console.log("Downloading project:", project.id, "Data:", projectData);
-                      if (project.pdfUrl) {
-                        window.open(project.pdfUrl, '_blank');
-                      } else {
-                        generatePDF(projectData);
-                      }
+                      // Usar el generador local (V2 robusto)
+                      generatePDF(projectData);
                     }}
                     className="w-full flex items-center justify-center gap-2 bg-foreground text-background py-2.5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
                   >
                     <FileDown className="w-4 h-4" />
-                    Descargar PDF
+                    📥 Descargar Reporte PDF
                   </button>
                 </>
               ) : (
