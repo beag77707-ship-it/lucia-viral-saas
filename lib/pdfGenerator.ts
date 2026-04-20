@@ -21,12 +21,28 @@ export const generatePDF = (project: any) => {
   
   // Extraer ideas de forma robusta
   let ideas = [];
-  const rawData = project.resultJSON;
+  let rawData = project.resultJSON;
+
+  // Intentar parsear si es un string
+  if (typeof rawData === 'string') {
+    try {
+      rawData = JSON.parse(rawData);
+    } catch (e) {
+      console.error("Error parsing resultJSON in PDF Generator:", e);
+    }
+  }
 
   if (Array.isArray(rawData)) {
     ideas = rawData;
   } else if (rawData && typeof rawData === 'object') {
-    ideas = rawData.ideas || rawData.data || rawData.results || [];
+    // Buscar en propiedades comunes donde OpenAI o n8n suelen dejar los datos
+    ideas = rawData.ideas || rawData.data || rawData.results || rawData.content || [];
+    
+    // Si sigue vacío pero hay una propiedad que es un array, probamos con esa
+    if (ideas.length === 0) {
+      const firstArrayKey = Object.keys(rawData).find(key => Array.isArray(rawData[key]));
+      if (firstArrayKey) ideas = rawData[firstArrayKey];
+    }
   }
   
   if (!ideas || ideas.length === 0) {

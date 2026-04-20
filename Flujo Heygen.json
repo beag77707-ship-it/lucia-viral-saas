@@ -64,7 +64,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $node['Webhook: Start Generation'].json.body.avatarId }}\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"6c647ade8e5b4875b0b1e5ef2c8d71e8\",\n        \"speed\": 1.1\n      },\n      \"background\": {\n        \"type\": \"image\",\n        \"url\": \"{{ $json.suggested_scenario === 'office' ? 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'living-room' ? 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'studio' ? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'nature' ? 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=1280' : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1280'))) }}\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $node['Webhook: Start Generation'].first().json.body.avatarId }}\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json.full_script }}\",\n        \"voice_id\": \"6c647ade8e5b4875b0b1e5ef2c8d71e8\",\n        \"speed\": 1.1\n      },\n      \"background\": {\n        \"type\": \"image\",\n        \"url\": \"{{ $json.suggested_scenario === 'office' ? 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'living-room' ? 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'studio' ? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=1280' : ($json.suggested_scenario === 'nature' ? 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=1280' : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=1280'))) }}\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1080,\n    \"height\": 1920\n  }\n}",
         "options": {}
       },
       "id": "b2631f19-0810-44bc-983c-c9a53b1a48c2",
@@ -91,7 +91,7 @@
           "parameters": [
             {
               "name": "projectId",
-              "value": "={{$node[\"Webhook: Start Generation\"].json.body.projectId}}"
+              "value": "={{$node[\"Webhook: Start Generation\"].first().json.body.projectId}}"
             },
             {
               "name": "title",
