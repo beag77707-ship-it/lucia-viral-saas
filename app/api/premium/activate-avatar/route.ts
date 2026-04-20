@@ -13,9 +13,7 @@ export async function POST(req: Request) {
 
     const { avatarId, targetUserEmail, projectId } = await req.json();
 
-    if (!avatarId) {
-      return NextResponse.json({ error: "Falta el ID del Avatar" }, { status: 400 });
-    }
+    // El ID es opcional ahora porque el usuario dice que ya está en n8n
 
     // Si no se especifica targetUserEmail, usamos el actual
     const emailToUpdate = targetUserEmail || session.user.email;

@@ -11,15 +11,12 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
   const [activatingProjectId, setActivatingProjectId] = useState<string | null>(null);
 
   const handleGenerateVideos = async (projectId: string) => {
-    const avatarId = prompt("Ingresa el ID de tu Avatar de HeyGen:");
-    if (!avatarId) return;
-
     setActivatingProjectId(projectId);
     try {
       const res = await fetch("/api/premium/activate-avatar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, avatarId }),
+        body: JSON.stringify({ projectId }),
       });
       
       if (res.ok) {
