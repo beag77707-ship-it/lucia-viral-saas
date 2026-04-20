@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import AvatarForm from "@/components/AvatarForm";
-import { ArrowLeft, UserCircle, HelpCircle, Key, CheckCircle2, ChevronRight, Video } from "lucide-react";
+import { ArrowLeft, UserCircle, HelpCircle, Key, CheckCircle2, ChevronRight, Video, Mic, User } from "lucide-react";
 import Link from "next/link";
 
 export default async function AvatarConfigPage() {
@@ -42,6 +42,8 @@ export default async function AvatarConfigPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Side: Steps */}
+        <div className="space-y-6">
           {/* Avatar Steps */}
           <div className="bg-card border border-border p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -83,7 +85,7 @@ export default async function AvatarConfigPage() {
                 <div>
                   <p className="text-white font-bold text-xs mb-1">Clona tu Voz</p>
                   <p className="text-[10px] text-gray-400 leading-relaxed">
-                    Ve a <span className="text-white">Voices -> Personal Voice -> Create a Voice</span>. Sube un audio tuyo de 1 min.
+                    Ve a <span className="text-white">Voices &rarr; Personal Voice &rarr; Create a Voice</span>. Sube un audio tuyo de 1 min.
                   </p>
                 </div>
               </div>
