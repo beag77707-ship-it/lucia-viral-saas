@@ -59,30 +59,39 @@ export async function POST(req: Request) {
       console.error("Error parsing resultJSON:", e);
     }
 
-    console.log("Sending to n8n:", n8nHeygenUrl);
+    console.log("Intentando activar flujo en n8n:", n8nHeygenUrl);
 
-    const n8nResponse = await fetch(n8nHeygenUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "START_VIDEO_GENERATION",
-        userId: targetProject.userId,
-        avatarId: avatarId || "HARDCODED_IN_N8N",
-        projectId: targetProject.id,
-        ideas: ideasPayload
-      }),
-    });
+    try {
+      const n8nResponse = await fetch(n8nHeygenUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "START_VIDEO_GENERATION",
+          userId: targetProject.userId,
+          avatarId: avatarId || "HARDCODED_IN_N8N",
+          projectId: targetProject.id,
+          ideas: ideasPayload
+        }),
+      });
 
-    if (!n8nResponse.ok) {
-      const errorText = await n8nResponse.text();
-      console.error("n8n Error response:", errorText);
-      throw new Error(`n8n respondió con error: ${n8nResponse.status}`);
+      if (!n8nResponse.ok) {
+        const errorText = await n8nResponse.text();
+        console.error("Error n8n (Status " + n8nResponse.status + "):", errorText);
+        return NextResponse.json({ 
+          error: `n8n respondió con error ${n8nResponse.status}. Asegúrate de que el flujo esté en modo 'Listen for Test Event'.` 
+        }, { status: n8nResponse.status });
+      }
+
+      return NextResponse.json({ 
+        message: "Generación de vídeos iniciada con éxito", 
+        projectId: targetProject.id 
+      });
+    } catch (fetchError: any) {
+      console.error("Fetch Error:", fetchError);
+      return NextResponse.json({ 
+        error: `No se pudo conectar con n8n: ${fetchError.message}. Revisa si la URL es correcta.` 
+      }, { status: 502 });
     }
-
-    return NextResponse.json({ 
-      message: "Generación de vídeos iniciada con éxito", 
-      projectId: targetProject.id 
-    });
   } catch (error: any) {
     console.error("Activation error:", error);
     return NextResponse.json({ error: "Error interno al iniciar generación" }, { status: 500 });
