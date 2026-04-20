@@ -105,48 +105,53 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
               </div>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-white/5 space-y-2">
+            <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
               {isCompleted ? (
                 <>
-                  <button
-                    onClick={() => setSelectedProjectForVideos(project)}
-                    className="w-full flex items-center justify-center gap-2 bg-primary/20 text-primary py-2.5 rounded-lg font-bold transition-all hover:bg-primary/30 active:scale-95 border border-primary/20"
-                  >
-                    <Film className="w-4 h-4" />
-                    Ver Reels ({project.videos?.length || 0})
-                  </button>
-                  <button
-                    onClick={() => {
-                      // Usar el generador local (V2 robusto)
-                      generatePDF(projectData);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 bg-foreground text-background py-2.5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
-                  >
-                    <FileDown className="w-4 h-4" />
-                    📥 Descargar Reporte PDF
-                  </button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02, backgroundColor: "rgba(var(--primary-rgb), 0.15)" }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedProjectForVideos(project)}
+                      className="flex items-center justify-center gap-2 bg-white/5 text-primary text-[11px] font-black uppercase tracking-wider py-3 rounded-xl border border-primary/20 transition-all"
+                    >
+                      <Film className="w-3.5 h-3.5" />
+                      Reels ({project.videos?.length || 0})
+                    </motion.button>
+                    
+                    <motion.button
+                      whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.9)" }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => generatePDF(projectData)}
+                      className="flex items-center justify-center gap-2 bg-white text-black text-[11px] font-black uppercase tracking-wider py-3 rounded-xl transition-all shadow-lg"
+                    >
+                      <FileDown className="w-3.5 h-3.5" />
+                      PDF
+                    </motion.button>
+                  </div>
 
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={() => handleGenerateVideos(project.id)}
                     disabled={activatingProjectId === project.id}
-                    className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-500/20 disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-xl shadow-purple-500/20 disabled:opacity-50 group"
                   >
                     {activatingProjectId === project.id ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <Video className="w-4 h-4" />
+                      <Video className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                     )}
                     🎬 Crear Vídeos IA
-                  </button>
+                  </motion.button>
                 </>
               ) : (
-                <button
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 bg-dark-900 text-gray-500 py-2.5 rounded-lg font-medium cursor-not-allowed border border-white/5"
-                >
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Trabajando...
-                </button>
+                <div className="w-full flex flex-col items-center justify-center py-4 rounded-2xl bg-white/5 border border-dashed border-white/10">
+                   <div className="relative mb-2">
+                      <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                   </div>
+                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest animate-pulse">Optimizando contenido...</span>
+                </div>
               )}
             </div>
           </motion.div>
