@@ -20,7 +20,11 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ message: "Avatar ID updated", avatarId: updatedUser.heygenAvatarId });
+    return NextResponse.json({ 
+      message: "Configuración de Avatar actualizada", 
+      avatarId: updatedUser.heygenAvatarId,
+      voiceId: updatedUser.heygenVoiceId
+    });
   } catch (error) {
     console.error("Update Avatar API Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

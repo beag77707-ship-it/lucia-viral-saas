@@ -7,14 +7,19 @@ import Link from "next/link";
 
 export default async function AvatarConfigPage() {
   const session = await getServerSession(authOptions);
+  
+  if (!session?.user) {
+    return <div>No autorizado</div>;
+  }
+
   const user = await prisma.user.findUnique({
-    where: { email: session?.user?.email! },
+    where: { email: session.user.email! },
     select: { heygenAvatarId: true, heygenVoiceId: true }
   });
 
   const projects = await prisma.project.findMany({
     where: { 
-      userId: (session?.user as any).id,
+      userId: (session.user as any).id,
       status: "COMPLETED" 
     },
     orderBy: { createdAt: 'desc' },
@@ -70,7 +75,7 @@ export default async function AvatarConfigPage() {
                 <div>
                   <p className="text-white font-bold text-sm mb-1">Pégalo en el formulario</p>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Pega el código en el recuadro de la derecha y dale a Guardar. ¡Y listo! Tu flujo ya usará ese avatar.
+                    Pega el código en el recuadro de la derecha y elige tu proyecto. ¡Y listo! Tu flujo ya usará ese avatar.
                   </p>
                 </div>
               </div>
@@ -78,11 +83,11 @@ export default async function AvatarConfigPage() {
           </div>
         </div>
 
-        {/* Right Side: Simple Form */}
+        {/* Right Side: Advanced Form */}
         <div className="space-y-6">
           <div className="bg-dark-800/50 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Key className="text-primary w-5 h-5" /> Configuración
+              <Key className="text-primary w-5 h-5" /> Configuración y Creación
             </h2>
             
             <AvatarForm 
