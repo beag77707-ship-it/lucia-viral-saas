@@ -47,22 +47,42 @@ export async function POST(req: Request) {
     });
 
     // 3. Disparar flujo de generación de videos en n8n
-    // Usamos la URL de producción (webhook) en lugar de webhook-test
-    const n8nHeygenUrl = "https://vmi3229350.contaboserver.net/webhook/heygen-activate";
+    // Usamos webhook-test para que puedas verlo en tiempo real mientras lo tienes abierto
+    const n8nHeygenUrl = "https://vmi3229350.contaboserver.net/webhook-test/heygen-activate";
     
-    fetch(n8nHeygenUrl, {
+    let ideasPayload = targetProject.resultJSON;
+    try {
+      if (typeof ideasPayload === 'string') {
+        ideasPayload = JSON.parse(ideasPayload);
+      }
+    } catch (e) {
+      console.error("Error parsing resultJSON:", e);
+    }
+
+    console.log("Sending to n8n:", n8nHeygenUrl);
+
+    const n8nResponse = await fetch(n8nHeygenUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         type: "START_VIDEO_GENERATION",
         userId: targetProject.userId,
-        avatarId: avatarId,
+        avatarId: avatarId || "HARDCODED_IN_N8N",
         projectId: targetProject.id,
-        ideas: targetProject.resultJSON // Aquí están los guiones
+        ideas: ideasPayload
       }),
-    }).catch(err => console.error("Error disparando generación en n8n:", err));
+    });
 
-    return NextResponse.json({ message: "Generación de vídeos iniciada con éxito", projectId: targetProject.id });
+    if (!n8nResponse.ok) {
+      const errorText = await n8nResponse.text();
+      console.error("n8n Error response:", errorText);
+      throw new Error(`n8n respondió con error: ${n8nResponse.status}`);
+    }
+
+    return NextResponse.json({ 
+      message: "Generación de vídeos iniciada con éxito", 
+      projectId: targetProject.id 
+    });
   } catch (error: any) {
     console.error("Activation error:", error);
     return NextResponse.json({ error: "Error interno al iniciar generación" }, { status: 500 });
