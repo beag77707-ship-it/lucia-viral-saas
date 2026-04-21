@@ -1,4 +1,9 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import AvatarForm from "@/components/AvatarForm";
+import { ArrowLeft, CheckCircle2, Mic, Key, Video } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 

@@ -55,9 +55,9 @@ export async function POST(req: Request) {
     }
 
     // 3. Disparar flujo de generación de videos en n8n
-    // Usamos webhook-test para que puedas verlo en tiempo real mientras lo tienes abierto
+    // Usamos la URL de producción para que funcione de forma automática
     // Volvemos a HTTPS sin puerto porque es el que sabemos que funciona en tu Contabo
-    const n8nHeygenUrl = "https://vmi3229350.contaboserver.net/webhook-test/heygen-activate";
+    const n8nHeygenUrl = "https://vmi3229350.contaboserver.net/webhook/heygen-activate";
     
     let ideasPayload = targetProject.resultJSON;
     try {
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
         const errorText = await n8nResponse.text();
         console.error("Error n8n (Status " + n8nResponse.status + "):", errorText);
         return NextResponse.json({ 
-          error: `n8n respondió con error ${n8nResponse.status}. Asegúrate de que el flujo esté en modo 'Listen for Test Event'.` 
+          error: `n8n respondió con error ${n8nResponse.status}. Asegúrate de que el flujo esté ACTIVO en n8n.` 
         }, { status: n8nResponse.status });
       }
 
