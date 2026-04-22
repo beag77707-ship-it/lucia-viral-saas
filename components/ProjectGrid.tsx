@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileDown, Calendar, Hash, Video, Settings, PlayCircle, Loader2, X, Film } from "lucide-react";
+import { FileDown, Calendar, Hash, Video, Settings, PlayCircle, Loader2, X, Film, Sparkles, Download } from "lucide-react";
 import { generatePDF } from "@/lib/pdfGenerator";
 import ReelsGallery from "./ReelsGallery";
 
