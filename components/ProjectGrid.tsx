@@ -115,41 +115,46 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
             <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
               {isCompleted ? (
                 <>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="grid grid-cols-3 gap-2 mb-3">
                     <motion.button
                       whileHover={{ scale: 1.02, backgroundColor: "rgba(var(--primary-rgb), 0.15)" }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedProjectForVideos(project)}
-                      className="flex items-center justify-center gap-2 bg-white/5 text-primary text-[11px] font-black uppercase tracking-wider py-3 rounded-xl border border-primary/20 transition-all"
+                      className="flex flex-col items-center justify-center gap-1 bg-white/5 text-primary text-[10px] font-black uppercase tracking-wider py-2 rounded-xl border border-primary/20 transition-all"
                     >
                       <Film className="w-3.5 h-3.5" />
                       Reels ({project.videos?.length || 0})
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02, backgroundColor: "rgba(16, 185, 129, 0.15)" }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedProjectForIdeas(project)}
+                      className="flex flex-col items-center justify-center gap-1 bg-white/5 text-emerald-400 text-[10px] font-black uppercase tracking-wider py-2 rounded-xl border border-emerald-500/20 transition-all"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Carruseles
                     </motion.button>
                     
                     <motion.button
                       whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.9)" }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => setSelectedProjectForIdeas(project)}
-                      className="flex items-center justify-center gap-2 bg-white text-black text-[11px] font-black uppercase tracking-wider py-3 rounded-xl transition-all shadow-lg"
+                      onClick={() => generatePDF(projectData)}
+                      className="flex flex-col items-center justify-center gap-1 bg-white text-black text-[10px] font-black uppercase tracking-wider py-2 rounded-xl transition-all shadow-lg"
                     >
                       <FileDown className="w-3.5 h-3.5" />
-                      Ideas / PDF
+                      Descargar PDF
                     </motion.button>
                   </div>
 
                   <motion.button
                     whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => handleGenerateVideos(project.id)}
-                    disabled={activatingProjectId === project.id}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-xl shadow-purple-500/20 disabled:opacity-50 group"
+                    onClick={() => { window.location.href = '/dashboard/settings'; }}
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-xl shadow-purple-500/20 group"
                   >
-                    {activatingProjectId === project.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Video className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                    )}
-                    🎬 Crear Vídeos IA
+                    <Settings className="w-4 h-4 group-hover:rotate-45 transition-transform" />
+                    ⚙️ Configurar Vídeos IA
                   </motion.button>
                 </>
               ) : (
