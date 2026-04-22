@@ -58,18 +58,24 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
   };
 
   const handleGenerateAllCarousels = async (project: any) => {
-    // 1. Abrimos el modal para que el usuario vea el progreso
-    setSelectedProjectForIdeas(project);
-
     if (!project.resultJSON || !Array.isArray(project.resultJSON)) return;
 
-    // 2. Revisamos si hay ideas sin generar
+    // Revisamos si hay ideas sin generar
     const hasUnfinished = project.resultJSON.some((idea: any) => !idea.carousel);
-    if (!hasUnfinished) return; // Si ya están todas, solo abrimos el modal
+    if (!hasUnfinished) {
+      // Si ya están todas generadas, solo abrimos el modal
+      setSelectedProjectForIdeas(project);
+      return; 
+    }
 
-    // 3. Avisamos y lanzamos la generación en bucle
-    alert(`¡Iniciando la generación de ${project.resultJSON.length} carruseles en segundo plano! Verás cómo aparecen cuando terminen.`);
+    // 1. Preguntamos al usuario si quiere generarlos
+    const confirmGenerate = window.confirm("¿Quieres iniciar la generación de los carruseles de tus guiones?");
+    if (!confirmGenerate) return;
+
+    // 2. Abrimos el modal para que el usuario vea el progreso
+    setSelectedProjectForIdeas(project);
     
+    // 3. Lanzamos la generación en bucle
     for (let i = 0; i < project.resultJSON.length; i++) {
       if (!project.resultJSON[i].carousel) {
         const success = await handleGenerateCarousel(project.id, i, project.resultJSON[i]);
