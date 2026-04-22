@@ -8,7 +8,9 @@ import ReelsGallery from "./ReelsGallery";
 
 export default function ProjectGrid({ initialProjects }: { initialProjects: any[] }) {
   const [selectedProjectForVideos, setSelectedProjectForVideos] = useState<any | null>(null);
+  const [selectedProjectForIdeas, setSelectedProjectForIdeas] = useState<any | null>(null);
   const [activatingProjectId, setActivatingProjectId] = useState<string | null>(null);
+  const [generatingCarouselIdx, setGeneratingCarouselIdx] = useState<number | null>(null);
 
   const handleGenerateVideos = async (projectId: string) => {
     setActivatingProjectId(projectId);
@@ -29,6 +31,28 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
       alert("Error de conexión");
     } finally {
       setActivatingProjectId(null);
+    }
+  };
+
+  const handleGenerateCarousel = async (projectId: string, ideaIndex: number, idea: any) => {
+    setGeneratingCarouselIdx(ideaIndex);
+    try {
+      const res = await fetch("/api/carousel/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, ideaIndex, idea }),
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        alert(`¡Carrusel enviado a generar! Te quedan ${data.creditsRemaining} usos este mes.`);
+      } else {
+        alert("Error: " + (data.error || "No se pudo iniciar"));
+      }
+    } catch (error) {
+      alert("Error de conexión");
+    } finally {
+      setGeneratingCarouselIdx(null);
     }
   };
 
@@ -91,7 +115,7 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
             <div className="mt-auto pt-6 border-t border-white/5 space-y-3">
               {isCompleted ? (
                 <>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 mb-3">
                     <motion.button
                       whileHover={{ scale: 1.02, backgroundColor: "rgba(var(--primary-rgb), 0.15)" }}
                       whileTap={{ scale: 0.98 }}
@@ -105,11 +129,11 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
                     <motion.button
                       whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.9)" }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => generatePDF(projectData)}
+                      onClick={() => setSelectedProjectForIdeas(project)}
                       className="flex items-center justify-center gap-2 bg-white text-black text-[11px] font-black uppercase tracking-wider py-3 rounded-xl transition-all shadow-lg"
                     >
                       <FileDown className="w-3.5 h-3.5" />
-                      PDF
+                      Ideas / PDF
                     </motion.button>
                   </div>
 
@@ -168,6 +192,117 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
               </div>
 
               <ReelsGallery videos={selectedProjectForVideos.videos} />
+            </motion.div>
+          </motion.div>
+      <AnimatePresence>
+        {selectedProjectForIdeas && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-dark-900 border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] p-8 relative shadow-2xl"
+            >
+              <button
+                onClick={() => setSelectedProjectForIdeas(null)}
+                className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="flex justify-between items-end mb-8">
+                <div>
+                  <h3 className="text-3xl font-black text-white italic tracking-tight mb-2">IDEAS GENERADAS</h3>
+                  <p className="text-gray-400">Proyecto: <span className="text-primary font-bold">{selectedProjectForIdeas.niche}</span></p>
+                </div>
+                <button
+                  onClick={() => generatePDF(selectedProjectForIdeas)}
+                  className="bg-white text-black px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2"
+                >
+                  <FileDown className="w-4 h-4" />
+                  Descargar PDF
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {selectedProjectForIdeas.resultJSON && Array.isArray(selectedProjectForIdeas.resultJSON) ? (
+                  selectedProjectForIdeas.resultJSON.map((idea: any, idx: number) => (
+                    <div key={idx} className="bg-dark-800 p-6 rounded-2xl border border-white/5">
+                      <h4 className="text-lg font-bold text-white mb-2">{idea.titulo || idea.title || `Idea ${idx + 1}`}</h4>
+                      <p className="text-sm text-gray-400 mb-4 line-clamp-2">{idea.guion || idea.full_script}</p>
+                      
+                      {idea.carousel ? (
+                        <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-2xl p-5 mt-4">
+                          <h5 className="text-green-400 font-bold mb-4 flex items-center gap-2">
+                            <Sparkles className="w-5 h-5" /> Carrusel y Arte Generado
+                          </h5>
+                          
+                          <div className="space-y-4">
+                            {idea.carousel.carousels?.[0]?.canva_payload?.pages?.map((page: any, pIdx: number) => (
+                              <div key={pIdx} className="bg-black/40 rounded-xl p-4 border border-white/5 flex gap-4 items-start">
+                                {page.generated_image_url ? (
+                                  <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 border border-white/10 group">
+                                    <img 
+                                      src={page.generated_image_url} 
+                                      alt="Generado por DALL-E" 
+                                      className="object-cover w-full h-full group-hover:scale-110 transition-transform"
+                                    />
+                                    <a 
+                                      href={page.generated_image_url} 
+                                      download={`slide_${pIdx + 1}.jpg`}
+                                      target="_blank"
+                                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                    >
+                                      <Download className="w-6 h-6 text-white" />
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <div className="w-24 h-24 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+                                    <span className="text-[10px] text-gray-500 uppercase">Sin Imagen</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-white text-sm font-semibold mb-1">Slide {pIdx + 1}</p>
+                                  <p className="text-gray-400 text-xs italic">"{page.text}"</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {/* Botón de copiar JSON para Canva si lo necesitan manual */}
+                          <div className="mt-4 pt-4 border-t border-green-500/20">
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(JSON.stringify(idea.carousel, null, 2));
+                                alert("¡JSON Copiado para usar en la app de Bulk Create de Canva!");
+                              }}
+                              className="w-full bg-green-500/20 hover:bg-green-500/30 text-green-300 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                            >
+                              <FileDown className="w-4 h-4" /> Copiar Datos para Canva
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleGenerateCarousel(selectedProjectForIdeas.id, idx, idea)}
+                          disabled={generatingCarouselIdx === idx}
+                          className="bg-primary/20 text-primary border border-primary/30 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-primary/30 transition-colors disabled:opacity-50"
+                        >
+                          {generatingCarouselIdx === idx ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                          Generar Diseño Completo (IA)
+                        </button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-400">Las ideas aún no están disponibles o el formato no es compatible.</p>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}

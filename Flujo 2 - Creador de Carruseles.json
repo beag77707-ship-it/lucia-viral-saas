@@ -1,0 +1,88 @@
+{
+  "name": "Flujo 2 - Creador de Carruseles V2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-carousel",
+        "options": {}
+      },
+      "id": "webhook-carousel",
+      "name": "Webhook Carrusel",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "webhookId": "carousel-generator-webhook"
+    },
+    {
+      "parameters": {
+        "text": "={{ JSON.stringify($json.body.idea) }}",
+        "requireOutputParser": true,
+        "options": {
+          "systemMessage": "Eres un arquitecto de automatización + experto en contenido viral para Instagram.\n\nTu misión es transformar guiones en carruseles completamente listos para ser generados automáticamente con IA y diseñados en Canva.\n\nOBJETIVO:\nPara CADA guion debes:\n1. Convertirlo en un carrusel de 3 a 5 slides\n2. Generar entre 3 y 4 prompts de imagen (uno por slide clave)\n3. Preparar la estructura lista para automatizar en Canva\n4. Optimizar todo para viralidad (hooks, claridad, guardados)\n\nREGLAS IMPORTANTES:\n* Cada slide debe tener una sola idea\n* Máximo 10-12 palabras por slide\n* Lenguaje simple, directo, sin relleno\n* El primer slide debe ser muy llamativo (curiosidad, error, miedo o promesa)\n* El último slide siempre debe ser CTA\n\nPROMPTS DE IMAGEN:\n* Estilo optimizado para IA (DALL·E, Stable Diffusion, etc.)\n* Máximo 25 palabras\n* Incluir: estilo visual, sujeto principal, iluminación, colores\n* Mantener coherencia visual entre todos los prompts\nEjemplo: \"modern fintech illustration, bitcoin falling, dark background, yellow accents, high contrast lighting, minimalist, cinematic\"\n\nIMPORTANTE:\n* Los prompts deben poder enviarse directamente a un generador de imágenes\n* El campo canva_payload debe estar listo para ser usado en automatización (1 slide = 1 página)\n* No expliques nada fuera del JSON\n* Devuelve SOLO JSON válido"
+        }
+      },
+      "id": "agent-carousel",
+      "name": "Generador de Carrusel (AI Agent)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "modelId": { "__rl": true, "value": "gpt-4o-mini", "mode": "list", "cachedResultName": "gpt-4o-mini" },
+        "options": {}
+      },
+      "id": "chat-model-carousel",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [180, 200]
+    },
+    {
+      "parameters": {
+        "schemaType": "fromJson",
+        "jsonSchema": "{\n  \"carousels\": [\n    {\n      \"title\": \"string\",\n      \"slides\": [\n        {\n          \"slide\": 0,\n          \"type\": \"string\",\n          \"text\": \"string\"\n        }\n      ],\n      \"image_prompts\": [\n        \"string\"\n      ],\n      \"visual_style_master\": \"string\",\n      \"canva_payload\": {\n        \"pages\": [\n          {\n            \"text\": \"string\",\n            \"image_prompt\": \"string\"\n          }\n        ]\n      }\n    }\n  ]\n}"
+      },
+      "id": "output-parser-carousel",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.1,
+      "position": [380, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lucia-viral-saas.vercel.app/api/webhooks/carousel-result",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "projectId", "value": "={{ $('Webhook Carrusel').item.json.body.projectId }}" },
+            { "name": "ideaIndex", "value": "={{ $('Webhook Carrusel').item.json.body.ideaIndex }}" },
+            { "name": "carouselData", "value": "={{ $json.output }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-sync-carousel",
+      "name": "Sync Frontend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 0]
+    }
+  ],
+  "connections": {
+    "Webhook Carrusel": {
+      "main": [ [ { "node": "Generador de Carrusel (AI Agent)", "type": "main", "index": 0 } ] ]
+    },
+    "Generador de Carrusel (AI Agent)": {
+      "main": [ [ { "node": "Sync Frontend", "type": "main", "index": 0 } ] ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [ [ { "node": "Generador de Carrusel (AI Agent)", "type": "ai_languageModel", "index": 0 } ] ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [ [ { "node": "Generador de Carrusel (AI Agent)", "type": "ai_outputParser", "index": 0 } ] ]
+    }
+  }
+}

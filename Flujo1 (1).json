@@ -80,39 +80,6 @@
     },
     {
       "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Nicho: {{$node['Webhook Trigger'].json.body.niche}}\nReferentes: {{$node['Webhook Trigger'].json.body.competitors}}\n\nA continuación tienes los 5 vídeos más virales con sus transcripciones reales:\n\n{{ $json.corpus }}\n\n----------------------------------\n\nEres un \"Consejo de Expertos en Marketing Viral\" compuesto por las mentes de:\n1. Seth Godin: Maestro del marketing de permiso. Exige que el contenido sea una \"Vaca Púrpura\" (extraordinario).\n2. Neil Patel: Genio del valor práctico. Estructura el contenido con datos y utilidad inmediata.\n3. Gary Vaynerchuk: El rey de la atención. Autenticidad cruda y hooks agresivos (\"Stop Scrolling\").\n4. Guy Kawasaki: Especialista en el \"Arte de Encantar\". Simplicidad y narrativa poderosa.\n\nTu objetivo es analizar profundamente los patrones virales y generar 5 NUEVAS ideas de contenido rompedoras mezclando estas 4 filosofías.\n\nReglas de Oro del Consejo:\n- Hook (Seth & Gary): Debe ser una bofetada emocional en el primer segundo.\n- Estructura (Neil): Aporta valor real (Problema -> Valor -> Solución).\n- Tono (Kawasaki): Hazlo simple, elegante e imposible de ignorar.\n\n----------------------------------\n\nINSTRUCCIONES:\n\nGenera EXACTAMENTE 5 ideas de contenido.\n\nPara cada idea, elige uno de estos 5 escenarios:\n- office (Oficina Moderna/Serio)\n- living-room (Sala Minimalista/Relax)\n- studio (Estudio Prof/Autoridad)\n- nature (Naturaleza/Exterior/Inspiracional)\n- abstract (Fondo Abstracto/Creativo)\n\nCada idea debe incluir:\n\n1. \"title\" → Título viral en MAYÚSCULAS\n2. \"hook\" → Primera frase ultra adictiva\n3. \"full_script\" → Guión completo (mejorado por el consejo)\n4. \"copy\" → Texto para Instagram (optimizado para engagement)\n5. \"hashtags\" → Array de 6 hashtags virales\n6. \"suggested_scenario\" → ID del escenario (office, living-room, studio, nature o abstract)\n\n----------------------------------\n\nIMPORTANTE:\n\n- NO expliques nada\n- NO uses markdown\n- SOLO devuelve JSON válido\n\nFormato exacto:\n\n{\n  \"ideas\": [\n    {\n      \"title\": \"...\",\n      \"hook\": \"...\",\n      \"full_script\": \"...\",\n      \"copy\": \"...\",\n      \"hashtags\": [\"...\", \"...\", \"...\", \"...\", \"...\", \"...\"],\n      \"suggested_scenario\": \"...\"\n    }\n  ]\n}"
-            }
-          ]
-        },
-        "jsonOutput": true,
-        "options": {}
-      },
-      "id": "95531495-897b-475b-a27d-1b403ad765bc",
-      "name": "OpenAI Generador",
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.1,
-      "position": [
-        7408,
-        1392
-      ],
-      "credentials": {
-        "openAiApi": {
-          "id": "8lgcaFH4RanfXIZr",
-          "name": "OpenAI account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "actorId": {
           "__rl": true,
           "value": "xMc5Ga1oCONPmWJIa",
@@ -289,6 +256,96 @@
       "position": [
         8224,
         1408
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.corpus }}\n\nINSTRUCCIONES EXTRA:\nFormato exacto de salida debe coincidir con el schema solicitado.",
+        "options": {
+          "systemMessage": "Eres un 'Consejo de Expertos en Marketing Viral' compuesto por:\n1. Seth Godin: Maestro del Vaca Púrpura.\n2. Neil Patel: Genio del valor táctico.\n3. Gary Vaynerchuk: Furia y Hooks.\n4. Guy Kawasaki: Magia del Pitch.\n\nSigue en estricto orden todas las instrucciones de tu Memoria Semántica para analizar el corpus antes de generar ideas. Devuelve siempre un JSON estructurado con la clave 'ideas'."
+        }
+      },
+      "id": "agent-core",
+      "name": "Consejo de Expertos (AI Agent)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        7408,
+        1392
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "id": "chat-model-1",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        7380,
+        1600
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "8lgcaFH4RanfXIZr",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableName": "documents",
+        "matchName": "match_documents"
+      },
+      "id": "vector-store-rag",
+      "name": "Supabase Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        7560,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "text-embedding-3-small",
+          "mode": "list",
+          "cachedResultName": "text-embedding-3-small"
+        }
+      },
+      "id": "openai-embeddings-tools",
+      "name": "OpenAI Embeddings Vector",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        7560,
+        1800
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "8lgcaFH4RanfXIZr",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "serpapi-tool",
+      "name": "Buscador de Tendencias",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        7740,
+        1600
       ]
     }
   ],
@@ -2917,18 +2974,7 @@
       "main": [
         [
           {
-            "node": "OpenAI Generador",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Generador": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
+            "node": "Consejo de Expertos (AI Agent)",
             "type": "main",
             "index": 0
           }
@@ -3023,6 +3069,61 @@
           {
             "node": "Code in JavaScript1",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consejo de Expertos (AI Agent)": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Consejo de Expertos (AI Agent)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Consejo de Expertos (AI Agent)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscador de Tendencias": {
+      "ai_tool": [
+        [
+          {
+            "node": "Consejo de Expertos (AI Agent)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings Vector": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store Tool",
+            "type": "ai_embedding",
             "index": 0
           }
         ]

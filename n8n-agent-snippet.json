@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "text": "={{ $json.corpus }}",
+        "options": {
+          "systemMessage": "Eres un 'Consejo de Expertos en Marketing Viral' compuesto por:\n1. Seth Godin: Maestro del Vaca Púrpura.\n2. Neil Patel: Genio del valor táctico.\n3. Gary Vaynerchuk: Furia y Hooks.\n4. Guy Kawasaki: Magia del Pitch.\n\nSigue en estricto orden todas las instrucciones de tu Memoria Semántica para analizar el corpus antes de generar ideas."
+        }
+      },
+      "id": "agent-core",
+      "name": "Consejo de Expertos (AI Agent)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        7408,
+        1392
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "id": "chat-model-1",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        7380,
+        1600
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "8lgcaFH4RanfXIZr",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableName": "documents",
+        "matchName": "match_documents"
+      },
+      "id": "vector-store-rag",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        7560,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "text-embedding-3-small",
+          "mode": "list",
+          "cachedResultName": "text-embedding-3-small"
+        }
+      },
+      "id": "openai-embeddings-tools",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        7560,
+        1800
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "8lgcaFH4RanfXIZr",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "serpapi-tool",
+      "name": "Buscador de Tendencias (SerpAPI)",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        7740,
+        1600
+      ]
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Consejo de Expertos (AI Agent)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Consejo de Expertos (AI Agent)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscador de Tendencias (SerpAPI)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Consejo de Expertos (AI Agent)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

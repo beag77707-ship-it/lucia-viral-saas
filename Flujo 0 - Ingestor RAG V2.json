@@ -1,0 +1,146 @@
+{
+  "name": "Flujo 0 - Ingestor RAG V2",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst text = \"# Sabiduría del Consejo de Marketing Viral\\nEste documento es la base de memoria semántica (RAG) utilizada por los Agentes de Inteligencia Artificial para entender, analizar y aplicar los principios de los referentes mundiales del marketing en la creación de guiones virales.\\n\\n## 1. SETH GODIN: La Vaca Púrpura (Purple Cow)\\n**Filosofía Principal:** Lo seguro es arriesgado. Lo muy bueno es aburrido. Tienes que ser extraordinario (\\\"remarkable\\\") o serás invisible. En un mundo lleno de vacas marrones, solo prestas atención a una Vaca Púrpura.\\n\\n### Reglas para el Agente:\\n- **Cero promedios:** Si el concepto del video es algo que diría el \\\"típico influencer\\\" del sector, bórralo. Destrúyelo. Busca el ángulo contrario o una perspectiva radical.\\n- **Tensión Emocional:** El marketing no es una transacción de datos, es provocar tensión. El espectador debe sentir que su situación actual es inaceptable o que se está perdiendo de un secreto crítico.\\n- **Marketing de Permiso:** No grites para que te escuchen. Susurra secretos a los que ya quieren escucharte. El contenido debe sentirse como un regalo exclusivo para una sub-tribu (ejemplo: \\\"Si eres afiliado y sigues sin ventas, esta es la cruda realidad que debes tragar\\\").\\n\\n## 2. GARY VAYNERCHUK (GaryVee): Stop Scrolling & Pragmatismo Crudo\\n**Filosofía Principal:** La atención es el único activo que importa. Gánatela en el segundo cero y recompénsala con valor hiper-práctico (\\\"Jab, Jab, Jab, Right Hook\\\").\\n\\n### Reglas para el Agente:\\n- **El Grito Inicial (El Hook):** Tienes 2 segundos en un Reel. El \\\"hook\\\" no puede ser \\\"Hola, hoy te voy a enseñar...\\\". Tiene que ser un puñetazo en la cara (metafórico). Ejemplos: \\\"Deja de perder tu tiempo haciendo X\\\", \\\"Todo lo que te dijeron sobre Y es mentira\\\", \\\"Esta es la razón por la que estás quebrado\\\". \\n- **Empatía + Bofetada:** Gary te dice que te quiere y luego te dice que eres un vago. Mezcla dureza con motivación cruda. \\\"Nadie vendrá a salvarte. Deja de quejarte del algoritmo y empieza a publicar buen contenido\\\".\\n- **Volumen y Documentación:** No \\\"creen\\\", documenten. La ejecución importa cien veces más que la teoría bonita. \\n\\n## 3. NEIL PATEL: El Rey de la Estructura y el Cebo Táctico\\n**Filosofía Principal:** Datos, SEO y utilidad microscópica. Muestra el número, enseña la táctica paso a paso y cierra el \\\"gap\\\" de conocimiento del usuario de inmediato.\\n\\n### Reglas para el Agente:\\n- **La Estructura Táctica:** El cuerpo del guion no puede ser filosófico. Debe seguir pasos claros: Paso 1, Paso 2, Paso 3.\\n- **Micro-Utilidad:** El cierre no es \\\"espero que te sirva\\\". Son instrucciones claras: \\\"Ve a esta web, pincha el botón verde, saca tu enlace y ponlo en tu bio hoy mismo\\\".\\n- **Números y Datos Concretos:** Siempre que sea posible, usar cifras (e.g., \\\"Crecer un 300%\\\", \\\"El método de los $5,000\\\", \\\"7 días de consistencia\\\"). La exactitud genera credibilidad.\\n\\n## 4. GUY KAWASAKI: El Arte de Encantar y la Magia del Pitch\\n**Filosofía Principal:** Simplificar lo complejo y convertir a los clientes en creyentes devotos. El pitch perfecto causa deleite (\\\"enchantment\\\").\\n\\n### Reglas para el Agente:\\n- **Mantra de 3 palabras:** Reduce la core-idea del guion a una frase o concepto extremadamente simple que se quede en la memoria (Ej. \\\"Menos ruido, más ventas\\\").\\n- **La Regla 10/20/30 (Adaptada a Reels):** Se directo y elegante. Usa un ritmo pausado en los puntos críticos, dando espacio para asimilar la información. \\n- **Magia:** Tu objetivo no es informar, es lograr que el oyente piense \\\"Wow\\\". Las palabras finales de cada Reel deben dejar al usuario inspirado y con un sabor de boca de algo premium.\\n\\n---\\n**Instrucción Final para el Agente Crítico:**\\nSi un guion generado por el Redactor no contiene un Hook abrasivo (Gary), una micro-táctica accionable (Neil), no resalta por encima del ruido del nicho (Godin) y no inspira al final (Kawasaki), tú debes vetarlo o reescribirlo usando estas reglas de memoria pura.\\n\";\nconst binaryData = Buffer.from(text, 'utf8').toString('base64');\n\nreturn [{\n  binary: {\n    data: {\n      data: binaryData,\n      mimeType: 'text/markdown',\n      fileName: 'knowledge_base.md'\n    }\n  }\n}];\n  "
+      },
+      "id": "read-file",
+      "name": "Generar Archivo Virtual",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "document-loader",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": 1000,
+        "chunkOverlap": 100
+      },
+      "id": "text-splitter",
+      "name": "Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        400,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "text-embedding-3-small",
+          "mode": "list",
+          "cachedResultName": "text-embedding-3-small"
+        }
+      },
+      "id": "embeddings",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        600,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "documents",
+        "matchName": "match_documents"
+      },
+      "id": "supabase-vector",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        600,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generar Archivo Virtual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Archivo Virtual": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

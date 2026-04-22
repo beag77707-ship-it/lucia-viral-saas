@@ -20,6 +20,9 @@ model User {
   heygenStatus    String    @default("IDLE")
   selectedScenarios String?   // Guardaremos ["office", "nature", ...] como JSON
   videoCredits    Int       @default(5)
+  scriptsGeneratedMonth Int @default(0)
+  carouselsGeneratedMonth Int @default(0)
+  generationResetDate DateTime @default(now())
   projects        Project[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -48,6 +51,7 @@ model Video {
   script      String?
   videoUrl    String?
   scenario    String?
+  carouselJson String?
   status      String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
   errorMessage String?
   createdAt   DateTime @default(now())
