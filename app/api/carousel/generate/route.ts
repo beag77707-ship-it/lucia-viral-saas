@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
     // Enviar al webhook de n8n específico para carruseles
     // Por defecto n8n estará escuchando en tu servidor de contabo
-    const carouselWebhookUrl = "https://vmi3229350.contaboserver.net/webhook/generate-carousel";
+    const carouselWebhookUrl = "https://vmi3229350.contaboserver.net/webhook-test/generate-carousel";
     
     try {
       axios.post(carouselWebhookUrl, {
