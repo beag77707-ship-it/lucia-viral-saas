@@ -157,7 +157,7 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
                     <motion.button
                       whileHover={{ scale: 1.02, backgroundColor: "rgba(16, 185, 129, 0.15)" }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => handleGenerateAllCarousels(project)}
+                      onClick={() => handleGenerateAllCarousels(projectData)}
                       className="flex flex-col items-center justify-center gap-1 bg-white/5 text-emerald-400 text-[10px] font-black uppercase tracking-wider py-2 rounded-xl border border-emerald-500/20 transition-all"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
