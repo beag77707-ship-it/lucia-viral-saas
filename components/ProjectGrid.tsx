@@ -194,6 +194,9 @@ export default function ProjectGrid({ initialProjects }: { initialProjects: any[
               <ReelsGallery videos={selectedProjectForVideos.videos} />
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {selectedProjectForIdeas && (
           <motion.div
