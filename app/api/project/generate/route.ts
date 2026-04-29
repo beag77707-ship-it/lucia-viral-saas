@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { niche, competitors, plan: bodyPlan } = body;
+    const { niche, competitors, plan: bodyPlan, language } = body;
 
     if (!niche || !competitors || competitors.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -76,6 +76,7 @@ export async function POST(req: Request) {
         userId,
         niche,
         competitors: JSON.stringify(competitors),
+        language: language || "es-ES",
         status: "PROCESSING",
       },
     });
@@ -99,6 +100,7 @@ export async function POST(req: Request) {
           userId,
           niche,
           competitors,
+          language: language || "es-ES",
           plan: userProfile?.plan || "BASIC",
           heygenAvatarId: heygenAvatarId,
           selectedScenarios: userProfile?.selectedScenarios,

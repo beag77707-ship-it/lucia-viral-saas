@@ -34,6 +34,7 @@ model Project {
   user        User     @relation(fields: [userId], references: [id])
   niche       String
   competitors String
+  language    String   @default("es-ES")
   resultJSON  String?
   pdfUrl      String?
   videoUrl    String?

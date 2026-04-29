@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const { data: session } = useSession();
   const [niche, setNiche] = useState("");
   const [competitors, setCompetitors] = useState(["", "", ""]);
+  const [language, setLanguage] = useState("es-ES");
   const [status, setStatus] = useState<"IDLE" | "LOADING" | "PROCESSING" | "COMPLETED">("IDLE");
   const [projectId, setProjectId] = useState<string | null>(null);
   const [projectData, setProjectData] = useState<any>(null);
@@ -57,6 +58,7 @@ export default function DashboardPage() {
         body: JSON.stringify({ 
           niche, 
           competitors: validCompetitors, 
+          language,
           plan: (session?.user as any)?.plan || "BASIC" 
         }),
       });
@@ -107,6 +109,20 @@ export default function DashboardPage() {
                 className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-primary focus:border-transparent transition-all"
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Idioma del Contenido</label>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-primary focus:border-transparent transition-all"
+                required
+              >
+                <option value="es-ES">🇪🇸 Español (España)</option>
+                <option value="es-AR">🇦🇷 Español (Argentina)</option>
+                <option value="en-US">🇺🇸 Inglés</option>
+              </select>
             </div>
             
             <div>
