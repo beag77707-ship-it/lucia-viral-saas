@@ -15,8 +15,8 @@ const config: Config = {
         "card-foreground": "var(--card-foreground)",
         border: "var(--border)",
         primary: {
-          DEFAULT: "#4F46E5",
-          dark: "#4338CA",
+          DEFAULT: "#3B5BF5",
+          dark: "#2A45CC",
         },
         dark: {
           900: "var(--background)",
