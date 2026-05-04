@@ -2,20 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Video, Settings, CheckCircle2 } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Sparkles, BarChart2, Library, Settings } from "lucide-react";
 
 export default function SidebarNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/dashboard/projects", label: "Mis Proyectos", icon: Video },
-    { href: "/dashboard/membership", label: "Configurar Avatar", icon: CheckCircle2 },
-    { href: "/dashboard/settings", label: "Configuración", icon: Settings },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
+    { href: "/dashboard/content", label: "Content AI", icon: Sparkles },
+    { href: "/dashboard/analytics", label: "Analytics", icon: BarChart2 },
+    { href: "/dashboard/library", label: "Library", icon: Library },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings },
   ];
 
   return (
-    <nav className="flex-1 px-4 space-y-2 mt-4">
+    <nav className="flex-1 px-3 space-y-1 mt-6">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;
@@ -24,14 +26,14 @@ export default function SidebarNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all group ${
               isActive
-                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                : "text-foreground hover:bg-primary/10 hover:text-primary"
+                ? "bg-primary text-white font-medium"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            <Icon className={`w-5 h-5 ${isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100"}`} />
-            <span className={isActive ? "font-semibold" : "font-medium"}>
+            <Icon className={`w-5 h-5 ${isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100"}`} />
+            <span className="text-sm">
               {item.label}
             </span>
           </Link>

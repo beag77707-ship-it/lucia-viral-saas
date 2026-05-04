@@ -19,9 +19,9 @@ const config: Config = {
           dark: "#2A45CC",
         },
         dark: {
-          900: "var(--background)",
-          800: "var(--card)",
-          700: "#334155",
+          900: "#0A0F1C", // Base background from image
+          800: "#131B2C", // Card background
+          700: "#1E293B", // Lighter card/hover
         }
       },
       backgroundImage: {

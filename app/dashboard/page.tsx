@@ -1,228 +1,215 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Loader2, FileDown, Video, CheckCircle2 } from "lucide-react";
-import { generatePDF } from "@/lib/pdfGenerator";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+} from "recharts";
+import GenerateModal from "@/components/GenerateModal";
+import { PlayCircle, CheckCircle, Clock, Video } from "lucide-react";
+
+const chartData = [
+  { day: '0', views: 10 },
+  { day: '3', views: 40 },
+  { day: '6', views: 25 },
+  { day: '9', views: 55 },
+  { day: '12', views: 45 },
+  { day: '15', views: 75 },
+  { day: '18', views: 55 },
+  { day: '21', views: 76 },
+  { day: '24', views: 65 },
+  { day: '27', views: 95 },
+  { day: '30', views: 100 },
+];
+
+const queueItems = [
+  { id: 1, title: "10 AI Tools for Creators", status: "Draft", tag: "Blue", icon: PlayCircle },
+  { id: 2, title: "The Future of Design", status: "Completed", tag: "Video", icon: Video },
+  { id: 3, title: "Viral Tech Trends", status: "Processing", tag: "Loading", icon: Clock },
+];
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  const [niche, setNiche] = useState("");
-  const [competitors, setCompetitors] = useState(["", "", ""]);
-  const [language, setLanguage] = useState("es-ES");
-  const [status, setStatus] = useState<"IDLE" | "LOADING" | "PROCESSING" | "COMPLETED">("IDLE");
-  const [projectId, setProjectId] = useState<string | null>(null);
-  const [projectData, setProjectData] = useState<any>(null);
-
-  // Polling hook
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (status === "PROCESSING" && projectId) {
-      interval = setInterval(async () => {
-        try {
-          const res = await fetch(`/api/project/status/${projectId}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.status === "COMPLETED") {
-              setStatus("COMPLETED");
-              setProjectData(data);
-              clearInterval(interval);
-            }
-            if (data.status === "FAILED") {
-              setStatus("IDLE");
-              clearInterval(interval);
-              alert("Error durante el procesamiento. Intenta de nuevo.");
-            }
-          }
-        } catch (error) {
-          console.error("Polling error", error);
-        }
-      }, 5000);
-    }
-    return () => clearInterval(interval);
-  }, [status, projectId]);
-
-  const handleGenerate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const validCompetitors = competitors.filter(c => c.trim() !== "");
-    if (!niche || validCompetitors.length === 0) {
-      return alert("El nicho y al menos 1 competidor son obligatorios.");
-    }
-
-    setStatus("LOADING");
-    try {
-      const res = await fetch("/api/project/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          niche, 
-          competitors: validCompetitors, 
-          language,
-          plan: (session?.user as any)?.plan || "BASIC" 
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setProjectId(data.projectId);
-        setStatus("PROCESSING");
-      } else {
-        alert(data.error);
-        setStatus("IDLE");
-      }
-    } catch (error) {
-      console.error(error);
-      setStatus("IDLE");
-      alert("Fallo al iniciar el proyecto.");
-    }
-  };
-
-  const handleCompetitorChange = (index: number, value: string) => {
-    const newComp = [...competitors];
-    newComp[index] = value;
-    setCompetitors(newComp);
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="space-y-8">
-      <header className="mb-8 border-b border-white/5 pb-8">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-          Nueva Máquina Viral
-        </h1>
-        <p className="text-gray-400 mt-2">Extrae los mejores ángulos de tus competidores usando Apify e IA.</p>
-      </header>
+    <>
+      <div className="flex flex-col gap-6 pb-20">
+        
+        {/* TOP ROW */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Create Content Action */}
+          <div className="lg:col-span-4 bg-dark-800 rounded-2xl p-6 flex flex-col justify-center border border-white/5">
+            <h2 className="text-xl font-bold mb-4">Create new content with AI</h2>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-colors self-start"
+            >
+              Generate Now
+            </button>
+          </div>
 
-      {status === "IDLE" || status === "LOADING" ? (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-dark-800 border border-white/5 p-6 rounded-2xl max-w-2xl"
-        >
-          <form onSubmit={handleGenerate} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Tu Nicho / Temática</label>
-              <input
-                type="text"
-                value={niche}
-                onChange={(e) => setNiche(e.target.value)}
-                placeholder="Ejemplo: Tips de Finanzas, Marketing para Clínicas..."
-                className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-primary focus:border-transparent transition-all"
-                required
-              />
+          {/* Stats */}
+          <div className="lg:col-span-8 bg-dark-800 rounded-2xl border border-white/5 flex items-center justify-between p-6">
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-sm font-medium mb-1">Total Content</span>
+              <span className="text-3xl font-bold text-white">1.2K</span>
             </div>
+            <div className="w-px h-12 bg-white/10 hidden sm:block"></div>
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-sm font-medium mb-1">Viral Score</span>
+              <span className="text-3xl font-bold text-white">88%</span>
+            </div>
+            <div className="w-px h-12 bg-white/10 hidden sm:block"></div>
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-sm font-medium mb-1">Engagement</span>
+              <span className="text-3xl font-bold text-white">14.5K</span>
+            </div>
+            <div className="w-px h-12 bg-white/10 hidden sm:block"></div>
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-sm font-medium mb-1">Total Views</span>
+              <span className="text-3xl font-bold text-white">2.1M</span>
+            </div>
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Idioma del Contenido</label>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:ring-primary focus:border-transparent transition-all"
-                required
-              >
-                <option value="es-ES">🇪🇸 Español (España)</option>
-                <option value="es-AR">🇦🇷 Español (Argentina)</option>
-                <option value="en-US">🇺🇸 Inglés</option>
+        {/* MIDDLE ROW */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Chart */}
+          <div className="lg:col-span-8 bg-dark-800 rounded-2xl border border-white/5 p-6 h-[380px] flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold">Content Performance (Last 30 Days)</h2>
+              <select className="bg-dark-900 border border-white/10 text-sm text-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-primary">
+                <option>Analytics</option>
+                <option>Views</option>
               </select>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Competidores (Usuarios de Instagram/TikTok)</label>
-              <div className="space-y-3">
-                {competitors.map((comp, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    value={comp}
-                    onChange={(e) => handleCompetitorChange(index, e.target.value)}
-                    placeholder={`Competidor ${index + 1} (@usuario)`}
-                    className="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:ring-primary focus:border-transparent transition-all"
-                    required={index === 0}
+            <div className="flex-1 w-full h-full min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="day" stroke="#6b7280" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#6b7280" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                    itemStyle={{ color: '#fff' }}
                   />
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={status === "LOADING"}
-              className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-[0_0_20px_rgba(79,70,229,0.2)] disabled:opacity-50"
-            >
-              {status === "LOADING" ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Iniciando...
-                </div>
-              ) : "Generar Insights Virales"}
-            </button>
-          </form>
-        </motion.div>
-      ) : status === "PROCESSING" ? (
-        <motion.div 
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center py-20 bg-dark-800 border border-white/5 rounded-2xl max-w-2xl text-center shadow-[0_0_50px_rgba(79,70,229,0.1)]"
-        >
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full blur-xl bg-primary/20 animate-pulse"></div>
-            <Loader2 className="w-16 h-16 text-primary animate-spin relative z-10" />
-          </div>
-          <h2 className="mt-8 text-2xl font-bold text-white">Analizando Datos</h2>
-          <p className="mt-2 text-gray-400 max-w-md">
-            Nuestro sistema está haciendo scraping con Apify, evaluando métricas e instruyendo a la inteligencia artificial... Esto tomará un par de minutos.
-          </p>
-        </motion.div>
-      ) : (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-          className="bg-dark-800 border-2 border-primary/20 p-8 rounded-2xl shadow-[0_0_40px_rgba(79,70,229,0.1)]"
-        >
-          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/5">
-            <CheckCircle2 className="w-10 h-10 text-green-400" />
-            <div>
-              <h2 className="text-2xl font-bold text-white">¡Generación Completada!</h2>
-              <p className="text-gray-400">Tus guiones virales están listos.</p>
+                  <Area type="monotone" dataKey="views" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <button 
-              onClick={() => generatePDF(projectData)}
-              className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 p-6 rounded-xl transition-all group"
-            >
-              <div className="p-3 bg-primary/20 rounded-full text-primary group-hover:scale-110 transition-transform">
-                <FileDown className="w-8 h-8" />
-              </div>
-              <div className="text-left">
-                <div className="text-lg font-bold text-white">Exportar PDF</div>
-                <div className="text-sm text-gray-400">Guiones, ideas y hooks</div>
-              </div>
-            </button>
-
-            <button 
-              className={`flex items-center justify-center gap-3 border p-6 rounded-xl transition-all group ${
-                (session?.user as any)?.plan === "PRO" 
-                ? "bg-white/5 hover:bg-white/10 border-purple-500/30 hover:border-purple-500"
-                : "bg-black/20 border-white/5 opacity-50 cursor-not-allowed"
-              }`}
-            >
-              <div className="p-3 bg-purple-500/20 rounded-full text-purple-400 group-hover:scale-110 transition-transform">
-                <Video className="w-8 h-8" />
-              </div>
-              <div className="text-left">
-                <div className="text-lg font-bold text-white">Auto-Vídeo HeyGen</div>
-                <div className="text-sm text-gray-400">
-                  {(session?.user as any)?.plan === "PRO" ? "Generar ahora" : "Plan Pro requerido"}
+          {/* Queue */}
+          <div className="lg:col-span-4 bg-dark-800 rounded-2xl border border-white/5 p-6 flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold">Script Generation Queue</h2>
+              <button className="text-gray-400 hover:text-white">•••</button>
+            </div>
+            
+            <div className="space-y-4 flex-1">
+              {queueItems.map((item) => (
+                <div 
+                  key={item.id} 
+                  className={`flex items-center justify-between p-4 rounded-xl border ${
+                    item.id === 1 ? 'bg-[#1e3a8a]/20 border-blue-500/30' : 
+                    item.id === 2 ? 'bg-[#064e3b]/20 border-green-500/30' : 
+                    'bg-[#78350f]/20 border-orange-500/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className={`text-2xl font-bold ${
+                      item.id === 1 ? 'text-blue-500' : 
+                      item.id === 2 ? 'text-green-500' : 
+                      'text-orange-500'
+                    }`}>{item.id}</span>
+                    <div>
+                      <h3 className="font-semibold text-sm mb-1">{item.title}</h3>
+                      <div className="flex gap-2">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                          item.id === 1 ? 'border-blue-500/50 text-blue-400' : 
+                          item.id === 2 ? 'border-green-500/50 text-green-400' : 
+                          'border-orange-500/50 text-orange-400'
+                        }`}>{item.status}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                          item.id === 1 ? 'border-blue-500/50 text-blue-400' : 
+                          item.id === 2 ? 'border-green-500/50 text-green-400' : 
+                          'border-orange-500/50 text-orange-400'
+                        }`}>{item.tag}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <item.icon className={`w-5 h-5 ${
+                    item.id === 1 ? 'text-blue-500' : 
+                    item.id === 2 ? 'text-green-500' : 
+                    'text-orange-500'
+                  }`} />
                 </div>
-              </div>
-            </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM ROW */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-dark-800 rounded-2xl border border-white/5 p-6 min-h-[300px]">
+             <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold">Video Preview & Refinement</h2>
+              <button className="text-gray-400 hover:text-white">•••</button>
+            </div>
+            <div className="w-full h-48 bg-dark-900 rounded-xl flex items-center justify-center border border-white/5">
+              <span className="text-gray-500 text-sm">Selecciona un proyecto para previsualizar</span>
+            </div>
           </div>
 
-          <div className="mt-8">
-             <button onClick={() => setStatus("IDLE")} className="text-sm text-gray-500 hover:text-white underline">
-               Volver a empezar
-             </button>
+          <div className="bg-dark-800 rounded-2xl border border-white/5 p-6 min-h-[300px]">
+             <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold">Recent Generated Scripts</h2>
+              <button className="text-gray-400 hover:text-white">•••</button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-400">
+                <thead className="text-xs uppercase bg-dark-900/50 text-gray-500 border-b border-white/5">
+                  <tr>
+                    <th className="px-4 py-3 rounded-tl-lg">Title</th>
+                    <th className="px-4 py-3">Date</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 rounded-tr-lg">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-white/5 hover:bg-white/5">
+                    <td className="px-4 py-3 font-medium text-white">Cómo automatizar Instagram</td>
+                    <td className="px-4 py-3">12 Oct 2026</td>
+                    <td className="px-4 py-3"><span className="text-green-400 bg-green-400/10 px-2 py-1 rounded">Listo</span></td>
+                    <td className="px-4 py-3 text-primary cursor-pointer hover:underline">Ver Script</td>
+                  </tr>
+                  <tr className="hover:bg-white/5">
+                    <td className="px-4 py-3 font-medium text-white">5 Herramientas de IA</td>
+                    <td className="px-4 py-3">10 Oct 2026</td>
+                    <td className="px-4 py-3"><span className="text-orange-400 bg-orange-400/10 px-2 py-1 rounded">Borrador</span></td>
+                    <td className="px-4 py-3 text-primary cursor-pointer hover:underline">Ver Script</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </motion.div>
-      )}
-    </div>
+        </div>
+      </div>
+
+      <GenerateModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        session={session} 
+      />
+    </>
   );
 }
