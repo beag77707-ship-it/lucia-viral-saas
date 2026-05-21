@@ -20,7 +20,7 @@ const features = [
   },
   {
     icon: <PlaySquare className="w-8 h-8 text-purple-400" />,
-    title: "Producción HeyGen",
+    title: "Producción con Avatar IA",
     description: "Convierte tus guiones en vídeos de alta calidad con avatares fotorrealistas y voces naturales de forma automática.",
     color: "from-purple-500/20 to-transparent",
     border: "border-purple-500/20"

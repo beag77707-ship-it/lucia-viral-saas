@@ -206,7 +206,7 @@ export default function GenerateModal({ isOpen, onClose, session }: GenerateModa
                     }`}
                   >
                     <Video className="w-8 h-8 text-purple-400" />
-                    <div className="font-bold text-white">Auto-Vídeo HeyGen</div>
+                    <div className="font-bold text-white">Auto-Vídeo Clonado</div>
                   </button>
                 </div>
 

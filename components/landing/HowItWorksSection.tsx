@@ -21,7 +21,7 @@ export default function HowItWorksSection() {
       number: "03",
       icon: <Video className="w-6 h-6 text-white" />,
       title: "Generación de Vídeo",
-      description: "Los guiones se envían a HeyGen, donde tu avatar digital cobra vida, y recibes el vídeo listo para subir a redes sociales."
+      description: "Los guiones se envían al generador de avatar clonado de Inteligencia Artificial, donde tu réplica digital cobra vida, y recibes el vídeo listo para subir a redes sociales."
     }
   ];
 

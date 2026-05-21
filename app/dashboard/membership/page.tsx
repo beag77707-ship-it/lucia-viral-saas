@@ -57,7 +57,7 @@ export default async function AvatarConfigPage() {
                 <div>
                   <p className="text-white font-bold text-xs mb-1">Crea tu "Instant Avatar"</p>
                   <p className="text-[10px] text-gray-400 leading-relaxed">
-                    En HeyGen, crea un <span className="text-white">Instant Avatar</span> y graba tu vídeo de consentimiento.
+                    Crea tu <span className="text-white">Avatar Clonado (Instant Avatar)</span> y graba tu vídeo de consentimiento.
                   </p>
                 </div>
               </div>

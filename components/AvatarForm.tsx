@@ -136,7 +136,7 @@ export default function AvatarForm({
         </div>
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-[9px] font-bold uppercase text-gray-400 px-1">Tu HeyGen Avatar ID</label>
+            <label className="text-[9px] font-bold uppercase text-gray-400 px-1">Tu Avatar ID</label>
             <input
               type="text"
               value={avatarId}
@@ -148,7 +148,7 @@ export default function AvatarForm({
 
           <div className="space-y-2">
             <label className="text-[9px] font-bold uppercase text-gray-400 px-1 flex items-center gap-1">
-              <Mic className="w-3 h-3" /> Tu HeyGen Voice ID
+              <Mic className="w-3 h-3" /> Tu Voice ID
             </label>
             <input
               type="text"

@@ -10,7 +10,7 @@ export default function ReelsGallery({ videos }: { videos: any[] }) {
         <Film className="w-12 h-12 text-gray-600 mx-auto" />
         <h3 className="text-xl font-bold text-gray-400">Aún no hay Reels generados</h3>
         <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          Los vídeos aparecerán aquí automáticamente una vez que la IA termine de grabarlos en HeyGen.
+          Los vídeos aparecerán aquí automáticamente una vez que la IA termine de procesarlos.
         </p>
       </div>
     );

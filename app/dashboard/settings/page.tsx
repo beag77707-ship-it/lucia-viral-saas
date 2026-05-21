@@ -209,10 +209,10 @@ export default function SettingsPage() {
                 },
                 { 
                   id: "PLAN_B", 
-                  title: "Creador Avatar X HeyGen", 
+                  title: "Creador Avatar IA", 
                   price: "79€", 
                   desc: "Plan A + Generación automática de videos usando tu avatar neuronal.",
-                  features: ["Todo el Plan A", "Integración HeyGen", "Videos con tu avatar", "Soporte Prioritario"]
+                  features: ["Todo el Plan A", "Integración de Avatar IA", "Videos con tu avatar", "Soporte Prioritario"]
                 }
               ].map((plan) => (
                 <div key={plan.id} className={`relative p-6 rounded-2xl border-2 transition-all ${
